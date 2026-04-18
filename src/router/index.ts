@@ -19,6 +19,21 @@ const router = createRouter({
       path: '/auth',
       name: 'auth',
       component: () => import('../views/AuthView.vue')
+    },
+    {
+      path: '/docs/terms',
+      name: 'terms',
+      component: () => import('../views/docs/TermsView.vue')
+    },
+    {
+      path: '/docs/privacy',
+      name: 'privacy',
+      component: () => import('../views/docs/PrivacyView.vue')
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue')
     }
   ]
 })
@@ -26,15 +41,14 @@ const router = createRouter({
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  // 不需要登录即可访问的公共页面
-  const publicPages = ['auth']
-  // 判断当前页面是否需要鉴权
-  const authRequired = !publicPages.includes(to.name as string)
-
-  if (authRequired && !authStore.isAuthenticated) {
-    // 如果需要鉴权但未登录，重定向到认证页
+  
+  // 判断是否为公共页面：auth 页，404 页，或者以 /docs/ 开头的页面
+  const isPublicPage = to.name === 'auth' || to.name === 'not-found' || to.path.startsWith('/docs/')
+  
+  if (!isPublicPage && !authStore.isAuthenticated) {
+    // 如果不是公共页面且未登录，重定向到认证页
     next({ name: 'auth' })
-  } else if (authStore.isAuthenticated && publicPages.includes(to.name as string)) {
+  } else if (authStore.isAuthenticated && to.name === 'auth') {
     // 如果已登录但访问的是认证页，重定向到首页
     next({ name: 'home' })
   } else {

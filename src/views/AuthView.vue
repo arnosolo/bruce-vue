@@ -195,10 +195,9 @@ const submitText = computed(() => {
         </button>
       </form>
       
-      <!-- 底部辅助说明 -->
       <div class="mt-8 flex flex-col items-center gap-4">
         <p class="text-center text-xs text-gray-400">
-          登录即表示您同意我们的 <a href="#" class="text-gray-600 underline">服务条款</a> 和 <a href="#" class="text-gray-600 underline">隐私政策</a>
+          登录即表示您同意我们的 <router-link to="/docs/terms" class="text-gray-600 underline">服务条款</router-link> 和 <router-link to="/docs/privacy" class="text-gray-600 underline">隐私政策</router-link>
         </p>
         
         <!-- 服务器状态显示 -->
