@@ -1,11 +1,20 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
+import ConfirmModal from './components/ConfirmModal.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
+const showLogoutConfirm = ref(false)
+
 function handleLogout() {
+  showLogoutConfirm.value = true
+}
+
+function confirmLogout() {
+  showLogoutConfirm.value = false
   authStore.logout()
   router.push('/auth')
 }
@@ -46,6 +55,14 @@ function handleLogout() {
   <main class="p-4 max-w-4xl mx-auto">
     <RouterView />
   </main>
+
+  <ConfirmModal
+    :show="showLogoutConfirm"
+    title="退出登录"
+    message="您确定要退出当前账号吗？"
+    @confirm="confirmLogout"
+    @cancel="showLogoutConfirm = false"
+  />
 </template>
 
 <style scoped>
