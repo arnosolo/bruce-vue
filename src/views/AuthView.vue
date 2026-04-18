@@ -102,15 +102,15 @@ const submitText = computed(() => {
       <!-- 头部切换 Tab -->
       <div class="flex mb-8 bg-gray-100 p-1 rounded-lg">
         <button 
-          class="flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200"
-          :class="mode === 'login' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'"
+          class="flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200 border-none outline-none cursor-pointer"
+          :class="mode === 'login' ? 'bg-white shadow-sm text-blue-600' : 'bg-transparent text-gray-500 hover:text-gray-700'"
           @click="toggleMode('login')"
         >
           登录
         </button>
         <button 
-          class="flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200"
-          :class="mode === 'register' ? 'bg-white shadow-sm text-green-600' : 'text-gray-500 hover:text-gray-700'"
+          class="flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200 border-none outline-none cursor-pointer"
+          :class="mode === 'register' ? 'bg-white shadow-sm text-green-600' : 'bg-transparent text-gray-500 hover:text-gray-700'"
           @click="toggleMode('register')"
         >
           注册
@@ -137,7 +137,7 @@ const submitText = computed(() => {
               v-model="form.name" 
               type="text" 
               placeholder="张三"
-              class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              class="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             >
           </div>
         </div>
@@ -155,7 +155,7 @@ const submitText = computed(() => {
               type="email" 
               required
               placeholder="name@example.com"
-              class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              class="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             >
           </div>
         </div>
@@ -173,7 +173,7 @@ const submitText = computed(() => {
               type="password" 
               required
               placeholder="••••••••"
-              class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              class="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             >
           </div>
         </div>
@@ -212,7 +212,7 @@ const submitText = computed(() => {
             }"
           ></div>
           <span class="text-[10px] font-medium uppercase tracking-wider text-gray-500">
-            Server: {{ serverStatus }}
+            服务器状态: {{ serverStatus === 'online' ? '在线' : serverStatus === 'offline' ? '离线' : '检查中' }}
           </span>
         </div>
       </div>
