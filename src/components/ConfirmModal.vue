@@ -29,16 +29,16 @@ const emit = defineEmits(['confirm', 'cancel'])
           <p class="text-gray-600">{{ message }}</p>
         </div>
         
-        <div class="flex border-t border-gray-100">
+        <div class="flex">
           <button 
             @click="emit('cancel')"
-            class="flex-1 px-4 py-3 text-gray-500 hover:bg-gray-50 transition-colors font-medium border-r border-gray-100"
+            class="flex-1 px-4 py-3 text-gray-500 hover:bg-gray-50 transition-colors font-medium border-r border-none"
           >
             {{ cancelText }}
           </button>
           <button 
             @click="emit('confirm')"
-            class="flex-1 px-4 py-3 text-blue-600 hover:bg-blue-50 transition-colors font-bold"
+            class="flex-1 px-4 py-3 text-blue-600 hover:bg-blue-50 transition-colors font-bold border-none"
           >
             {{ confirmText }}
           </button>

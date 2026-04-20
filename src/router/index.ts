@@ -39,7 +39,7 @@ const router = createRouter({
 })
 
 // 全局路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _, next) => {
   const authStore = useAuthStore()
   
   // 判断是否为公共页面：auth 页，404 页，或者以 /docs/ 开头的页面
