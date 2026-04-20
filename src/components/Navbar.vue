@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import { APP_NAME } from '../constants'
 import { useAuthStore } from '../stores/auth'
 import ConfirmModal from './ConfirmModal.vue'
 
@@ -31,9 +32,9 @@ function confirmLogout() {
       <div class="flex items-center gap-8">
         <RouterLink to="/" class="flex items-center gap-2 no-underline group" exact-active-class="none">
           <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-            <span class="text-white font-bold text-xl">A</span>
+            <span class="text-white font-bold text-xl">AI</span>
           </div>
-          <span class="font-bold text-gray-900 text-lg tracking-tight">AI Customer</span>
+          <span class="font-bold text-gray-900 text-lg tracking-tight">{{ APP_NAME }}</span>
         </RouterLink>
         
         <div v-if="authStore.isAuthenticated" class="flex items-center gap-1">
