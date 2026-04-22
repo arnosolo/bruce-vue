@@ -32,6 +32,21 @@ export interface RegisterResponse {
   data: AuthData
 }
 
+export interface ProfileResponse {
+  success: boolean
+  data: User
+}
+
+export interface UpdateProfileParams {
+  name?: string
+}
+
+export interface UpdateProfileResponse {
+  success: boolean
+  message: string
+  data: User
+}
+
 /**
  * Authentication related API calls
  */
@@ -48,5 +63,19 @@ export const authApi = {
    */
   register(data: RegisterParams): Promise<RegisterResponse> {
     return http.post('/auth/register', data)
+  },
+
+  /**
+   * Get current user profile
+   */
+  getProfile(): Promise<ProfileResponse> {
+    return http.get('/auth/me')
+  },
+
+  /**
+   * Update current user profile
+   */
+  updateProfile(data: UpdateProfileParams): Promise<UpdateProfileResponse> {
+    return http.put('/auth/me', data)
   }
 }
