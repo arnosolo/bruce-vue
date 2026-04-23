@@ -1,17 +1,17 @@
 import http from '../utils/http'
+import type { BaseResponse } from '../types/api'
 
-export interface HealthResponse {
-  success: boolean
-  message: string
-  data: {
-    status: string
-    database: string
-  }
+export interface HealthData {
+  status: string
+  database: string
 }
+
+/** 健康检查响应 */
+export interface HealthResponse extends BaseResponse<HealthData> {}
 
 export const systemApi = {
   /**
-   * Check API health status
+   * 检查 API 健康状态
    */
   getHealth(): Promise<HealthResponse> {
     return http.get('/health')

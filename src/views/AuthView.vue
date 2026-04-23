@@ -69,7 +69,7 @@ async function handleSubmit() {
       })
     }
 
-    if (result.success) {
+    if (result.success && result.data) {
       if (result.data.token) {
         authStore.setAuth(result.data.token, result.data.user)
         router.push('/')

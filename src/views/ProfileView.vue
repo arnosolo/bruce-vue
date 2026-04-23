@@ -30,7 +30,7 @@ async function fetchProfile() {
     loading.value = true
     error.value = ''
     const response = await authApi.getProfile()
-    if (response.success) {
+    if (response.success && response.data) {
       profile.value = response.data
       syncStore(response.data)
     }
@@ -121,7 +121,7 @@ async function handleSave() {
     saving.value = true
     error.value = ''
     const response = await authApi.updateProfile({ name: editForm.name })
-    if (response.success) {
+    if (response.success && response.data) {
       profile.value = response.data
       syncStore(response.data)
       isEditing.value = false
