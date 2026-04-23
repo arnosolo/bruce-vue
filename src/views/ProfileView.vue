@@ -15,6 +15,16 @@ const editForm = reactive({
   name: ''
 })
 
+const isChangingPassword = ref(false)
+const passwordSaving = ref(false)
+const passwordError = ref('')
+const passwordSuccess = ref('')
+const passwordForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
 async function fetchProfile() {
   try {
     loading.value = true
@@ -49,6 +59,59 @@ function startEdit() {
 function cancelEdit() {
   isEditing.value = false
   error.value = ''
+}
+
+function startChangePassword() {
+  isChangingPassword.value = true
+  passwordError.value = ''
+  passwordSuccess.value = ''
+  passwordForm.oldPassword = ''
+  passwordForm.newPassword = ''
+  passwordForm.confirmPassword = ''
+}
+
+function cancelChangePassword() {
+  isChangingPassword.value = false
+  passwordError.value = ''
+}
+
+async function handlePasswordSave() {
+  if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    passwordError.value = '两次输入的密码不一致'
+    return
+  }
+  
+  if (passwordForm.newPassword.length < 8) {
+    passwordError.value = '新密码长度至少为8位'
+    return
+  }
+  
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+  if (!passwordRegex.test(passwordForm.newPassword)) {
+    passwordError.value = '新密码需包含大写字母、小写字母和数字'
+    return
+  }
+
+  try {
+    passwordSaving.value = true
+    passwordError.value = ''
+    passwordSuccess.value = ''
+    const response = await authApi.changePassword({
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword
+    })
+    if (response.success) {
+      passwordSuccess.value = '密码修改成功'
+      setTimeout(() => {
+        isChangingPassword.value = false
+        passwordSuccess.value = ''
+      }, 2000)
+    }
+  } catch (err: any) {
+    passwordError.value = err.message || '修改密码失败，请检查旧密码是否正确'
+  } finally {
+    passwordSaving.value = false
+  }
 }
 
 async function handleSave() {
@@ -194,6 +257,100 @@ onMounted(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安全设置 -->
+    <div v-if="profile && !loading" class="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-8 py-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">安全设置</h3>
+              <p class="text-sm text-gray-500">保护您的账户安全</p>
+            </div>
+          </div>
+          <button 
+            v-if="!isChangingPassword"
+            @click="startChangePassword"
+            class="px-4 py-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+          >
+            修改密码
+          </button>
+        </div>
+
+        <div v-if="isChangingPassword" class="space-y-4 max-w-md">
+          <div v-if="passwordError" class="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            {{ passwordError }}
+          </div>
+          <div v-if="passwordSuccess" class="bg-green-50 text-green-600 p-3 rounded-lg text-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            {{ passwordSuccess }}
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-700">当前密码</label>
+            <input 
+              v-model="passwordForm.oldPassword"
+              type="password"
+              class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+              placeholder="请输入当前密码"
+            >
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-700">新密码</label>
+            <input 
+              v-model="passwordForm.newPassword"
+              type="password"
+              class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+              placeholder="请输入新密码（至少8位）"
+            >
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-gray-700">确认新密码</label>
+            <input 
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+              placeholder="请再次输入新密码"
+            >
+          </div>
+
+          <div class="flex gap-2 pt-2">
+            <button 
+              @click="cancelChangePassword"
+              :disabled="passwordSaving"
+              class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+            >
+              取消
+            </button>
+            <button 
+              @click="handlePasswordSave"
+              :disabled="passwordSaving"
+              class="px-4 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+            >
+              <span v-if="passwordSaving" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+              {{ passwordSaving ? '修改中...' : '确认修改' }}
+            </button>
+          </div>
+        </div>
+        
+        <div v-else class="flex items-center gap-2 text-sm text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+          </svg>
+          定期修改密码可以提高账户安全性
         </div>
       </div>
     </div>

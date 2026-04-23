@@ -47,6 +47,16 @@ export interface UpdateProfileResponse {
   data: User
 }
 
+export interface ChangePasswordParams {
+  oldPassword: string
+  newPassword: string
+}
+
+export interface ChangePasswordResponse {
+  success: boolean
+  message: string
+}
+
 /**
  * Authentication related API calls
  */
@@ -77,5 +87,12 @@ export const authApi = {
    */
   updateProfile(data: UpdateProfileParams): Promise<UpdateProfileResponse> {
     return http.put('/auth/me', data)
+  },
+
+  /**
+   * Change current user password
+   */
+  changePassword(data: ChangePasswordParams): Promise<ChangePasswordResponse> {
+    return http.put('/auth/password', data)
   }
 }
