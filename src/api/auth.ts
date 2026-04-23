@@ -55,6 +55,9 @@ export interface ChangePasswordParams {
 /** 修改密码响应 */
 export interface ChangePasswordResponse extends BaseResponse<void> {}
 
+/** 注销账号响应 */
+export interface DeleteAccountResponse extends BaseResponse<void> {}
+
 /**
  * 身份认证相关的 API 调用
  */
@@ -92,5 +95,12 @@ export const authApi = {
    */
   changePassword(data: ChangePasswordParams): Promise<ChangePasswordResponse> {
     return http.put('/auth/password', data)
+  },
+
+  /**
+   * 注销当前用户账号
+   */
+  deleteAccount(): Promise<DeleteAccountResponse> {
+    return http.delete('/auth/me')
   }
 }

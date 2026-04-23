@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, onUnmounted, ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api/auth'
+import ConfirmModal from '../components/ConfirmModal.vue'
 import type { User } from '../types/user'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const loading = ref(true)
 const profile = ref<User | null>(null)
 const error = ref('')
@@ -24,6 +27,28 @@ const passwordForm = reactive({
   newPassword: '',
   confirmPassword: ''
 })
+
+const showDeleteConfirm = ref(false)
+const deleting = ref(false)
+const deleteCountdown = ref(0)
+let timer: any = null
+
+function startDeleteCountdown() {
+  deleteCountdown.value = 5
+  if (timer) clearInterval(timer)
+  timer = setInterval(() => {
+    deleteCountdown.value--
+    if (deleteCountdown.value <= 0) {
+      if (timer) clearInterval(timer)
+      timer = null
+    }
+  }, 1000)
+}
+
+function openDeleteConfirm() {
+  showDeleteConfirm.value = true
+  startDeleteCountdown()
+}
 
 async function fetchProfile() {
   try {
@@ -133,6 +158,22 @@ async function handleSave() {
   }
 }
 
+async function handleDeleteAccount() {
+  try {
+    deleting.value = true
+    const response = await authApi.deleteAccount()
+    if (response.success) {
+      authStore.logout()
+      router.push('/login')
+    }
+  } catch (err: any) {
+    alert(err.message || '注销失败，请稍后再试')
+  } finally {
+    deleting.value = false
+    showDeleteConfirm.value = false
+  }
+}
+
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleString('zh-CN', {
     year: 'numeric',
@@ -145,6 +186,10 @@ function formatDate(dateString: string) {
 
 onMounted(() => {
   fetchProfile()
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
 })
 </script>
 
@@ -354,5 +399,42 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- 危险区域 -->
+    <div v-if="profile && !loading" class="mt-6 bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+      <div class="px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900">危险区域</h3>
+              <p class="text-sm text-gray-500">这些操作不可逆，请谨慎操作</p>
+            </div>
+          </div>
+          <button 
+            @click="openDeleteConfirm"
+            class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            注销账号
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 注销确认弹窗 -->
+    <ConfirmModal
+      :show="showDeleteConfirm"
+      title="确认注销账号？"
+      message="一旦注销，您的所有数据将被永久删除。请注意：注销后，相同的电子邮箱地址将无法再次注册此平台。"
+      :confirm-text="deleteCountdown > 0 ? `确认注销 (${deleteCountdown}s)` : '确认注销'"
+      :confirm-disabled="deleteCountdown > 0 || deleting"
+      cancel-text="取消"
+      @confirm="handleDeleteAccount"
+      @cancel="showDeleteConfirm = false"
+    />
   </div>
 </template>

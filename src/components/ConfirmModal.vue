@@ -5,12 +5,14 @@ interface Props {
   message: string
   confirmText?: string
   cancelText?: string
+  confirmDisabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: '确认',
   confirmText: '确定',
-  cancelText: '取消'
+  cancelText: '取消',
+  confirmDisabled: false
 })
 
 const emit = defineEmits(['confirm', 'cancel'])
@@ -37,8 +39,9 @@ const emit = defineEmits(['confirm', 'cancel'])
             {{ cancelText }}
           </button>
           <button 
-            @click="emit('confirm')"
-            class="flex-1 px-4 py-3 text-blue-600 hover:bg-blue-50 transition-colors font-bold border-none"
+            @click="!confirmDisabled && emit('confirm')"
+            :disabled="confirmDisabled"
+            class="flex-1 px-4 py-3 text-blue-600 hover:bg-blue-50 transition-colors font-bold border-none disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
           >
             {{ confirmText }}
           </button>
