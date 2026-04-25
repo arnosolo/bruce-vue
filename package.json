@@ -15,7 +15,9 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@iconify-json/carbon": "^1.2.20",
     "@types/node": "^24.12.2",
+    "@unocss/preset-icons": "^66.6.8",
     "@unocss/vite": "^66.6.8",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.1",

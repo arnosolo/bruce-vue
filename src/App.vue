@@ -4,13 +4,13 @@ import Navbar from './components/Navbar.vue'
 </script>
 
 <template>
-  <Navbar />
-
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-    <RouterView />
-  </main>
+  <div class="min-h-screen flex flex-col bg-gray-50">
+    <Navbar />
+    <main class="flex-1 flex flex-col">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
-<style>
-/* Global styles or transitions if needed */
+<style scoped>
 </style>

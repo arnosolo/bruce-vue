@@ -39,8 +39,8 @@ http.interceptors.response.use(
         case 401:
           // Unauthorized: Clear auth and redirect to login
           authStore.logout()
-          if (router.currentRoute.value.name !== 'login') {
-            router.push('/login')
+          if (router.currentRoute.value.name !== 'auth') {
+            router.push('/auth')
           }
           break
         case 403:

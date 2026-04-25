@@ -10,13 +10,16 @@ const router = useRouter()
 
 const navItems = [
   { name: '首页', path: '/' },
+  { name: '聊天', path: '/chat' },
   { name: '关于', path: '/about' }
 ]
 
 const showLogoutConfirm = ref(false)
+const isMobileMenuOpen = ref(false)
 
 function handleLogout() {
   showLogoutConfirm.value = true
+  isMobileMenuOpen.value = false
 }
 
 function confirmLogout() {
@@ -24,39 +27,44 @@ function confirmLogout() {
   authStore.logout()
   router.push('/auth')
 }
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
 </script>
 
 <template>
   <header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-gray-100">
-    <nav class="flex h-16 items-center justify-between max-w-5xl mx-auto px-4 sm:px-6">
-      <div class="flex items-center gap-8">
-        <RouterLink to="/" class="flex items-center gap-2 no-underline group" exact-active-class="none">
-          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-            <span class="text-white font-bold text-xl">AI</span>
-          </div>
-          <span class="font-bold text-gray-900 text-lg tracking-tight">{{ APP_NAME }}</span>
-        </RouterLink>
-        
-        <div v-if="authStore.isAuthenticated" class="flex items-center gap-1">
-          <RouterLink 
-            v-for="item in navItems" 
-            :key="item.path" 
-            :to="item.path" 
-            v-slot="{ isActive }"
-          >
-            <span 
-              :class="[
-                'px-3 py-2 text-sm font-medium transition-colors rounded-md no-underline cursor-pointer',
-                isActive ? 'text-blue-600 bg-gray-50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-              ]"
-            >
-              {{ item.name }}
-            </span>
-          </RouterLink>
+    <nav class="flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Logo -->
+      <RouterLink to="/" class="flex items-center gap-2 no-underline group" exact-active-class="none">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
+          <span class="text-white font-bold text-xl">AI</span>
         </div>
+        <span class="font-bold text-gray-900 text-lg tracking-tight">{{ APP_NAME }}</span>
+      </RouterLink>
+      
+      <!-- Desktop Nav Items -->
+      <div v-if="authStore.isAuthenticated" class="hidden md:flex items-center gap-1">
+        <RouterLink 
+          v-for="item in navItems" 
+          :key="item.path" 
+          :to="item.path" 
+          v-slot="{ isActive }"
+        >
+          <span 
+            :class="[
+              'px-3 py-2 text-sm font-medium transition-colors rounded-md no-underline cursor-pointer',
+              isActive ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+            ]"
+          >
+            {{ item.name }}
+          </span>
+        </RouterLink>
       </div>
       
-      <div class="flex items-center gap-4">
+      <!-- Desktop User Actions -->
+      <div class="hidden md:flex items-center gap-4">
         <template v-if="authStore.isAuthenticated">
           <RouterLink to="/profile" class="flex items-center gap-3 pr-4 border-r border-gray-200 no-underline hover:opacity-80 transition-opacity">
             <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
@@ -64,7 +72,7 @@ function confirmLogout() {
                 {{ (authStore.user?.name || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
               </span>
             </div>
-            <span class="hidden sm:inline text-sm text-gray-600 font-medium">
+            <span class="text-sm text-gray-600 font-medium">
               {{ authStore.user?.name || authStore.user?.email }}
             </span>
           </RouterLink>
@@ -83,7 +91,72 @@ function confirmLogout() {
           登录
         </RouterLink>
       </div>
+
+      <!-- Mobile Menu Button -->
+      <div class="flex md:hidden items-center gap-2">
+        <button 
+          v-if="authStore.isAuthenticated"
+          @click="toggleMobileMenu" 
+          class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <span :class="isMobileMenuOpen ? 'i-carbon-close' : 'i-carbon-menu'" class="text-2xl"></span>
+        </button>
+        <RouterLink 
+          v-else-if="$route.name !== 'auth'" 
+          to="/auth" 
+          class="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg"
+        >
+          登录
+        </RouterLink>
+      </div>
     </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div 
+      v-if="isMobileMenuOpen && authStore.isAuthenticated" 
+      class="md:hidden bg-white border-t border-gray-100 py-4 px-4 shadow-xl animate-fade-in"
+    >
+      <div class="space-y-1 mb-6">
+        <RouterLink 
+          v-for="item in navItems" 
+          :key="item.path" 
+          :to="item.path"
+          @click="isMobileMenuOpen = false"
+          v-slot="{ isActive }"
+          class="block"
+        >
+          <div :class="[
+            'px-4 py-3 rounded-xl text-base font-medium transition-all',
+            isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+          ]">
+            {{ item.name }}
+          </div>
+        </RouterLink>
+      </div>
+      
+      <div class="pt-4 border-t border-gray-100 flex flex-col gap-2">
+        <RouterLink 
+          to="/profile" 
+          @click="isMobileMenuOpen = false"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50"
+        >
+          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
+            {{ (authStore.user?.name || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <div class="text-sm font-bold text-gray-900">{{ authStore.user?.name || '用户' }}</div>
+            <div class="text-xs text-gray-500">{{ authStore.user?.email }}</div>
+          </div>
+        </RouterLink>
+        <button 
+          @click="handleLogout"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 text-left font-medium"
+        >
+          <span class="i-carbon-logout text-xl"></span>
+          退出登录
+        </button>
+      </div>
+    </div>
   </header>
 
   <ConfirmModal
@@ -96,5 +169,11 @@ function confirmLogout() {
 </template>
 
 <style scoped>
-/* 使用 v-slot 动态控制样式，不再需要 .router-link-active */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
 </style>
