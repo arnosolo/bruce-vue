@@ -122,8 +122,11 @@ const toggleSidebar = () => {
           <div
             v-for="msg in chatStore.messages"
             :key="msg.id"
-            :class="['flex', msg.role === 'USER' ? 'justify-end' : 'justify-start']"
+            :class="['flex flex-col', msg.role === 'USER' ? 'items-end' : 'items-start']"
           >
+            <span class="text-[11px] text-gray-400 mb-1 px-1">
+              {{ msg.role === 'USER' ? (authStore.user?.name || '你') : 'AI 助手' }}
+            </span>
             <div
               :class="[
                 'max-w-[85%] md:max-w-[70%] p-3 md:p-4 rounded-2xl shadow-sm',
@@ -141,7 +144,8 @@ const toggleSidebar = () => {
               </div>
             </div>
           </div>
-          <div v-if="chatStore.isSending" class="flex justify-start">
+          <div v-if="chatStore.isSending" class="flex flex-col items-start">
+            <span class="text-[11px] text-gray-400 mb-1 px-1">AI 助手</span>
             <div class="bg-white border border-gray-100 p-3 rounded-2xl shadow-sm flex items-center gap-1">
               <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
               <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
