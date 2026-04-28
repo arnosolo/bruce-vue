@@ -52,6 +52,29 @@ const selectConversation = (id: number) => {
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
 }
+
+const formatMessageTime = (dateStr: string) => {
+  const date = new Date(dateStr)
+  const now = new Date()
+  
+  const isToday = date.toDateString() === now.toDateString()
+  const isThisYear = date.getFullYear() === now.getFullYear()
+
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+
+  if (isToday) {
+    return `${hours}:${minutes}`
+  }
+  
+  if (isThisYear) {
+    return `${month}-${day} ${hours}:${minutes}`
+  }
+  
+  return `${date.getFullYear()}-${month}-${day} ${hours}:${minutes}`
+}
 </script>
 
 <template>
@@ -89,7 +112,7 @@ const toggleSidebar = () => {
           ]"
         >
           <div class="font-medium truncate text-sm">{{ conv.title || '无标题会话' }}</div>
-          <div class="text-[10px] text-gray-400 mt-1">{{ new Date(conv.createdAt).toLocaleString() }}</div>
+          <div class="text-[10px] text-gray-400 mt-1">{{ formatMessageTime(conv.createdAt) }}</div>
         </div>
       </div>
     </div>
@@ -124,9 +147,14 @@ const toggleSidebar = () => {
             :key="msg.id"
             :class="['flex flex-col', msg.role === 'USER' ? 'items-end' : 'items-start']"
           >
-            <span class="text-[11px] text-gray-400 mb-1 px-1">
-              {{ msg.role === 'USER' ? (authStore.user?.name || '你') : 'AI 助手' }}
-            </span>
+            <div class="flex items-center gap-2 mb-1 px-1">
+              <span class="text-[11px] font-medium text-gray-500">
+                {{ msg.role === 'USER' ? (authStore.user?.name || '你') : 'AI 助手' }}
+              </span>
+              <span class="text-[10px] text-gray-400">
+                {{ formatMessageTime(msg.createdAt) }}
+              </span>
+            </div>
             <div
               :class="[
                 'max-w-[85%] md:max-w-[70%] p-3 md:p-4 rounded-2xl shadow-sm',
@@ -134,18 +162,13 @@ const toggleSidebar = () => {
               ]"
             >
               <div class="text-sm md:text-base whitespace-pre-wrap break-words">{{ msg.content }}</div>
-              <div
-                :class="[
-                  'text-[10px] mt-1.5 opacity-70',
-                  msg.role === 'USER' ? 'text-blue-50' : 'text-gray-400'
-                ]"
-              >
-                {{ new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
-              </div>
             </div>
           </div>
           <div v-if="chatStore.isSending" class="flex flex-col items-start">
-            <span class="text-[11px] text-gray-400 mb-1 px-1">AI 助手</span>
+            <div class="flex items-center gap-2 mb-1 px-1">
+              <span class="text-[11px] font-medium text-gray-500">AI 助手</span>
+              <span class="text-[10px] text-gray-400">正在输入...</span>
+            </div>
             <div class="bg-white border border-gray-100 p-3 rounded-2xl shadow-sm flex items-center gap-1">
               <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
               <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
