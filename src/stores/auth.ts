@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from '../types/user'
+import { authApi } from '../api/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || '')
@@ -15,6 +16,25 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify(newUser))
   }
 
+  function setUser(newUser: User) {
+    user.value = newUser
+    localStorage.setItem('user', JSON.stringify(newUser))
+  }
+
+  async function fetchUserProfile() {
+    if (!token.value) return
+    try {
+      const res = await authApi.getProfile()
+      if (res.data) {
+        setUser(res.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error)
+      // 如果是认证错误，清除本地状态
+      logout()
+    }
+  }
+
   function logout() {
     token.value = ''
     user.value = null
@@ -27,6 +47,8 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     isAuthenticated,
     setAuth,
+    setUser,
+    fetchUserProfile,
     logout
   }
 })
