@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { chatApi } from '../api/chat'
+import { TITLE_SUMMARIZATION_THRESHOLD } from '../constants'
 import type { Conversation, Message } from '../types/chat'
 
 export const useChatStore = defineStore('chat', () => {
@@ -58,13 +59,14 @@ export const useChatStore = defineStore('chat', () => {
   async function sendMessage(content: string) {
     if (!currentConversationId.value) return
     
+    const conversationId = currentConversationId.value
     // 1. 乐观更新：立即显示用户消息
     const tempId = Date.now()
     const tempUserMessage: Message = {
       id: tempId,
       content,
       role: 'USER',
-      conversationId: currentConversationId.value,
+      conversationId,
       senderId: null, // 临时消息
       createdAt: new Date().toISOString()
     }
@@ -72,7 +74,7 @@ export const useChatStore = defineStore('chat', () => {
     
     isSending.value = true
     try {
-      const res = await chatApi.sendMessage(currentConversationId.value, content)
+      const res = await chatApi.sendMessage(conversationId, content)
       if (res.success && res.data) {
         // 2. 替换临时消息并添加 AI 回复
         const index = messages.value.findIndex(m => m.id === tempId)
@@ -81,17 +83,18 @@ export const useChatStore = defineStore('chat', () => {
         }
         messages.value.push(res.data.aiMessage)
 
-        // 3. 如果返回了新标题，同步更新会话列表中的标题
-        if (res.data.newTitle) {
-          const conversation = conversations.value.find(c => c.id === currentConversationId.value)
-          if (conversation) {
-            conversation.title = res.data.newTitle
-            conversation.isTitleGenerated = true
-          }
+        // 3. 如果标题未生成，且消息数量达到阈值，则触发总结
+        const conversation = conversations.value.find(c => c.id === conversationId)
+        if (
+          conversation &&
+          !conversation.isTitleGenerated &&
+          messages.value.length >= TITLE_SUMMARIZATION_THRESHOLD
+        ) {
+          summarizeConversationTitle(conversationId)
         }
       }
     } catch (error) {
-      // 3. 错误处理：如果发送失败，可以标记该消息或将其移除
+      // 错误处理：如果发送失败，移除临时消息
       const index = messages.value.findIndex(m => m.id === tempId)
       if (index !== -1) {
         messages.value.splice(index, 1)
@@ -145,33 +148,50 @@ export const useChatStore = defineStore('chat', () => {
             }
           }
 
-          // 处理标题更新
-          if (chunk.newTitle) {
-            const conv = conversations.value.find(c => c.id === conversationId)
-            if (conv) {
-              conv.title = chunk.newTitle
-              conv.isTitleGenerated = true
-            }
-          }
-
-          // 处理最终消息对象替换 (带数据库 ID 和发送者信息)
+          // 处理最终消息对象替换
           if (chunk.message) {
             const index = messages.value.findIndex(m => m.id === aiTempId)
             if (index !== -1) {
               messages.value[index] = chunk.message
             }
           }
+
+          // 流结束时，如果标题未生成，且消息数量达到阈值，则触发总结
+          if (chunk.done) {
+            const conversation = conversations.value.find(c => c.id === conversationId)
+            if (
+              conversation &&
+              !conversation.isTitleGenerated &&
+              messages.value.length >= TITLE_SUMMARIZATION_THRESHOLD
+            ) {
+              summarizeConversationTitle(conversationId)
+            }
+          }
         }
       )
     } catch (error) {
       console.error('Streaming error:', error)
-      // 移除预占消息
       const userIdx = messages.value.findIndex(m => m.id === tempId)
       if (userIdx !== -1) messages.value.splice(userIdx, 1)
       const aiIdx = messages.value.findIndex(m => m.id === aiTempId)
       if (aiIdx !== -1) messages.value.splice(aiIdx, 1)
     } finally {
       isSending.value = false
+    }
+  }
+
+  async function summarizeConversationTitle(conversationId: number) {
+    try {
+      const res = await chatApi.summarizeTitle(conversationId)
+      if (res.success && res.data) {
+        const conversation = conversations.value.find(c => c.id === conversationId)
+        if (conversation) {
+          conversation.title = res.data.title
+          conversation.isTitleGenerated = true
+        }
+      }
+    } catch (error) {
+      console.error('Failed to summarize title:', error)
     }
   }
 
@@ -196,6 +216,7 @@ export const useChatStore = defineStore('chat', () => {
     fetchMessages,
     sendMessage,
     sendStreamingMessage,
+    summarizeConversationTitle,
     setCurrentConversation
   }
 })

@@ -48,6 +48,13 @@ export const chatApi = {
   },
 
   /**
+   * 自动总结会话标题
+   */
+  summarizeTitle(conversationId: number): Promise<BaseResponse<{ title: string }>> {
+    return http.post(`/conversations/${conversationId}/summarize-title`)
+  },
+
+  /**
    * 流式发送消息并获取 AI 回复 (SSE)
    */
   async streamMessage(
