@@ -1,10 +1,12 @@
 import http from '../utils/http'
+import { useAuthStore } from '../stores/auth'
 import type { BaseResponse } from '../types/api'
 import type {
   Conversation,
   ConversationListResponse,
   MessageListResponse,
-  SendMessageResponse
+  SendMessageResponse,
+  StreamChunk
 } from '../types/chat'
 
 /**
@@ -43,5 +45,58 @@ export const chatApi = {
     content: string
   ): Promise<BaseResponse<SendMessageResponse>> {
     return http.post(`/conversations/${conversationId}/messages`, { content })
+  },
+
+  /**
+   * 流式发送消息并获取 AI 回复 (SSE)
+   */
+  async streamMessage(
+    conversationId: number,
+    content: string,
+    onChunk: (chunk: StreamChunk) => void
+  ): Promise<void> {
+    const authStore = useAuthStore()
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}/messages/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authStore.token}`
+      },
+      body: JSON.stringify({ content })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || 'Streaming request failed')
+    }
+
+    const reader = response.body?.getReader()
+    const decoder = new TextDecoder()
+
+    if (!reader) return
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const chunkText = decoder.decode(value, { stream: true })
+      const lines = chunkText.split('\n')
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim()
+          if (data === '[DONE]') {
+            onChunk({ done: true })
+            break
+          }
+          try {
+            const parsed: StreamChunk = JSON.parse(data)
+            onChunk(parsed)
+          } catch (e) {
+            console.error('Failed to parse SSE data', e)
+          }
+        }
+      }
+    }
   }
 }

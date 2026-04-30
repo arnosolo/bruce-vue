@@ -102,6 +102,79 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  async function sendStreamingMessage(content: string) {
+    if (!currentConversationId.value) return
+
+    const conversationId = currentConversationId.value
+    
+    // 1. 乐观更新：用户消息
+    const tempId = Date.now()
+    const tempUserMessage: Message = {
+      id: tempId,
+      content,
+      role: 'USER',
+      conversationId,
+      senderId: null,
+      createdAt: new Date().toISOString()
+    }
+    messages.value.push(tempUserMessage)
+
+    // 2. 预占 AI 消息位
+    const aiTempId = tempId + 1
+    const aiMessage: Message = {
+      id: aiTempId,
+      content: '',
+      role: 'ASSISTANT',
+      conversationId,
+      senderId: null,
+      createdAt: new Date().toISOString()
+    }
+    messages.value.push(aiMessage)
+
+    isSending.value = true
+    try {
+      await chatApi.streamMessage(
+        conversationId,
+        content,
+        (chunk) => {
+          // 处理流式内容
+          if (chunk.content) {
+            const index = messages.value.findIndex(m => m.id === aiTempId)
+            if (index !== -1) {
+              messages.value[index].content += chunk.content
+            }
+          }
+
+          // 处理标题更新
+          if (chunk.newTitle) {
+            const conv = conversations.value.find(c => c.id === conversationId)
+            if (conv) {
+              conv.title = chunk.newTitle
+              conv.isTitleGenerated = true
+            }
+          }
+
+          // 处理最终消息对象替换 (带数据库 ID 和发送者信息)
+          if (chunk.message) {
+            const index = messages.value.findIndex(m => m.id === aiTempId)
+            if (index !== -1) {
+              messages.value[index] = chunk.message
+            }
+          }
+        }
+      )
+    } catch (error) {
+      console.error('Streaming error:', error)
+      // 移除预占消息
+      const userIdx = messages.value.findIndex(m => m.id === tempId)
+      if (userIdx !== -1) messages.value.splice(userIdx, 1)
+      const aiIdx = messages.value.findIndex(m => m.id === aiTempId)
+      if (aiIdx !== -1) messages.value.splice(aiIdx, 1)
+    } finally {
+      isSending.value = false
+    }
+  }
+
   function setCurrentConversation(id: number | null) {
     currentConversationId.value = id
     if (id) {
@@ -122,6 +195,7 @@ export const useChatStore = defineStore('chat', () => {
     createConversation,
     fetchMessages,
     sendMessage,
+    sendStreamingMessage,
     setCurrentConversation
   }
 })
