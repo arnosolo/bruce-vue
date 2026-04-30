@@ -80,6 +80,15 @@ export const useChatStore = defineStore('chat', () => {
           messages.value[index] = res.data.userMessage
         }
         messages.value.push(res.data.aiMessage)
+
+        // 3. 如果返回了新标题，同步更新会话列表中的标题
+        if (res.data.newTitle) {
+          const conversation = conversations.value.find(c => c.id === currentConversationId.value)
+          if (conversation) {
+            conversation.title = res.data.newTitle
+            conversation.isTitleGenerated = true
+          }
+        }
       }
     } catch (error) {
       // 3. 错误处理：如果发送失败，可以标记该消息或将其移除
