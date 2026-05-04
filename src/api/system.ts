@@ -15,5 +15,18 @@ export const systemApi = {
    */
   getHealth(): Promise<HealthResponse> {
     return http.get('/health')
+  },
+
+  /**
+   * 后端直接上传文件
+   */
+  uploadFile(file: File): Promise<BaseResponse<{ name: string; url: string; key: string }>> {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/oss/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   }
 }

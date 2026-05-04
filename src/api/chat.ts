@@ -6,6 +6,7 @@ import type {
   ConversationListResponse,
   MessageListResponse,
   SendMessageResponse,
+  SendMessageRequest,
   StreamChunk
 } from '../types/chat'
 
@@ -42,9 +43,9 @@ export const chatApi = {
    */
   sendMessage(
     conversationId: number,
-    content: string
+    params: SendMessageRequest
   ): Promise<BaseResponse<SendMessageResponse>> {
-    return http.post(`/conversations/${conversationId}/messages`, { content })
+    return http.post(`/conversations/${conversationId}/messages`, params)
   },
 
   /**

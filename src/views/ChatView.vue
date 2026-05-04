@@ -3,6 +3,7 @@ import { onMounted, ref, nextTick, watch } from 'vue'
 import { useChatStore } from '../stores/chat'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
+import { systemApi } from '../api/system'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
@@ -11,6 +12,8 @@ const router = useRouter()
 const newMessage = ref('')
 const messageContainer = ref<HTMLElement | null>(null)
 const isSidebarOpen = ref(false) // 移动端侧边栏状态
+const fileInput = ref<HTMLInputElement | null>(null)
+const isUploading = ref(false)
 
 const scrollToBottom = async () => {
   await nextTick()
@@ -37,6 +40,40 @@ const handleSendMessage = async () => {
   const content = newMessage.value
   newMessage.value = ''
   await chatStore.sendMessage(content)
+}
+
+const handleImageUpload = () => {
+  fileInput.value?.click()
+}
+
+const onFileChange = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  // 限制文件大小，例如 5MB
+  if (file.size > 5 * 1024 * 1024) {
+    alert('图片大小不能超过 5MB')
+    return
+  }
+
+  isUploading.value = true
+  try {
+    // 调用后端直接上传接口
+    const res = await systemApi.uploadFile(file)
+    if (!res.success || !res.data) {
+      throw new Error(res.message || '上传失败')
+    }
+
+    // 发送图片消息
+    await chatStore.sendMessage('', 'IMAGE', res.data.key)
+  } catch (error) {
+    console.error('Image upload failed:', error)
+    alert(error instanceof Error ? error.message : '图片上传失败')
+  } finally {
+    isUploading.value = false
+    if (fileInput.value) fileInput.value.value = ''
+  }
 }
 
 const handleNewChat = async () => {
@@ -157,11 +194,15 @@ const formatMessageTime = (dateStr: string) => {
             </div>
             <div
               :class="[
-                'max-w-[85%] md:max-w-[70%] p-3 md:p-4 rounded-2xl shadow-sm',
+                'max-w-[85%] md:max-w-[70%] rounded-2xl shadow-sm overflow-hidden',
+                msg.type === 'IMAGE' ? 'p-0' : 'p-3 md:p-4',
                 msg.role === 'USER' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
               ]"
             >
-              <div class="text-sm md:text-base whitespace-pre-wrap break-words">{{ msg.content }}</div>
+              <template v-if="msg.type === 'IMAGE'">
+                <img :src="msg.url || ''" alt="image message" class="max-w-full block cursor-zoom-in hover:opacity-90 transition-opacity" />
+              </template>
+              <div v-else class="text-sm md:text-base whitespace-pre-wrap break-words">{{ msg.content }}</div>
             </div>
           </div>
           <div v-if="chatStore.isSending" class="flex flex-col items-start">
@@ -179,7 +220,23 @@ const formatMessageTime = (dateStr: string) => {
 
         <!-- Input Area -->
         <div class="p-3 md:p-4 bg-white border-t pb-safe">
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="onFileChange"
+          />
           <div class="flex gap-2 md:gap-3 items-end max-w-4xl mx-auto">
+            <button
+              @click="handleImageUpload"
+              :disabled="chatStore.isSending || isUploading"
+              class="w-12 h-12 flex-shrink-0 bg-gray-100 text-gray-500 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center disabled:opacity-50"
+              title="发送图片"
+            >
+              <span v-if="isUploading" class="i-carbon-loading animate-spin text-xl"></span>
+              <span v-else class="i-carbon-image text-xl"></span>
+            </button>
             <textarea
               v-model="newMessage"
               @keydown.enter.prevent="handleSendMessage"
@@ -190,7 +247,7 @@ const formatMessageTime = (dateStr: string) => {
             ></textarea>
             <button
               @click="handleSendMessage"
-              :disabled="!newMessage.trim() || chatStore.isSending"
+              :disabled="!newMessage.trim() || chatStore.isSending || isUploading"
               class="w-12 h-12 flex-shrink-0 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 disabled:bg-gray-300 transition-all flex items-center justify-center shadow-lg shadow-blue-100 disabled:shadow-none"
             >
               <span class="i-carbon-send text-xl"></span>

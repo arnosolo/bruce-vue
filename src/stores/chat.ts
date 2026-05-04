@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { chatApi } from '../api/chat'
 import { TITLE_SUMMARIZATION_THRESHOLD } from '../constants'
-import type { Conversation, Message } from '../types/chat'
+import type { Conversation, Message, MessageType } from '../types/chat'
 
 export const useChatStore = defineStore('chat', () => {
   const conversations = ref<Conversation[]>([])
@@ -56,7 +56,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function sendMessage(content: string) {
+  async function sendMessage(content: string, type: MessageType = 'TEXT', attachmentKey?: string) {
     if (!currentConversationId.value) return
     
     const conversationId = currentConversationId.value
@@ -66,6 +66,9 @@ export const useChatStore = defineStore('chat', () => {
       id: tempId,
       content,
       role: 'USER',
+      type,
+      attachmentKey: attachmentKey || null,
+      url: null, // 临时没有 URL
       conversationId,
       senderId: null, // 临时消息
       createdAt: new Date().toISOString()
@@ -74,7 +77,7 @@ export const useChatStore = defineStore('chat', () => {
     
     isSending.value = true
     try {
-      const res = await chatApi.sendMessage(conversationId, content)
+      const res = await chatApi.sendMessage(conversationId, { content, type, attachmentKey })
       if (res.success && res.data) {
         // 2. 替换临时消息并添加 AI 回复
         const index = messages.value.findIndex(m => m.id === tempId)
@@ -116,6 +119,9 @@ export const useChatStore = defineStore('chat', () => {
       id: tempId,
       content,
       role: 'USER',
+      type: 'TEXT',
+      attachmentKey: null,
+      url: null,
       conversationId,
       senderId: null,
       createdAt: new Date().toISOString()
@@ -128,6 +134,9 @@ export const useChatStore = defineStore('chat', () => {
       id: aiTempId,
       content: '',
       role: 'ASSISTANT',
+      type: 'TEXT',
+      attachmentKey: null,
+      url: null,
       conversationId,
       senderId: null,
       createdAt: new Date().toISOString()
