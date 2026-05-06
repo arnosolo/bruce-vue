@@ -59,9 +59,10 @@ const onFileChange = async (e: Event) => {
 
   isUploading.value = true
   try {
-    // 调用后端直接上传接口
-    const res = await systemApi.uploadFile(file)
+    // 调用后端聊天附件上传接口
+    const res = await systemApi.uploadChatFile(file)
     if (!res.success || !res.data) {
+
       throw new Error(res.message || '上传失败')
     }
 

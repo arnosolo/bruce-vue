@@ -1,5 +1,5 @@
 import http from '../utils/http'
-import type { BaseResponse } from '../types/api'
+import type { BaseResponse, UploadResponse } from '../types/api'
 
 export interface HealthData {
   status: string
@@ -18,12 +18,25 @@ export const systemApi = {
   },
 
   /**
-   * 后端直接上传文件
+   * 上传用户头像 (公开访问)
    */
-  uploadFile(file: File): Promise<BaseResponse<{ name: string; url: string; key: string }>> {
+  uploadAvatar(file: File): Promise<BaseResponse<UploadResponse>> {
     const formData = new FormData()
     formData.append('file', file)
-    return http.post('/oss/upload', formData, {
+    return http.post('/oss/upload/avatar', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+
+  /**
+   * 上传聊天附件 (私有访问)
+   */
+  uploadChatFile(file: File): Promise<BaseResponse<UploadResponse>> {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/oss/upload/chat', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
