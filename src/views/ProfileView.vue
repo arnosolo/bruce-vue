@@ -3,6 +3,8 @@ import { onMounted, onUnmounted, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api/auth'
+import { systemApi } from '../api/system'
+import { compressImage } from '../utils/image'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import type { User } from '../types/user'
 
@@ -17,6 +19,9 @@ const saving = ref(false)
 const editForm = reactive({
   name: ''
 })
+
+const fileInput = ref<HTMLInputElement | null>(null)
+const isUploadingAvatar = ref(false)
 
 const isChangingPassword = ref(false)
 const passwordSaving = ref(false)
@@ -57,20 +62,12 @@ async function fetchProfile() {
     const response = await authApi.getProfile()
     if (response.success && response.data) {
       profile.value = response.data
-      syncStore(response.data)
+      authStore.setUser(response.data)
     }
   } catch (err: any) {
     error.value = err.message || '获取个人资料失败'
   } finally {
     loading.value = false
-  }
-}
-
-function syncStore(userData: User) {
-  // Update the store if the data has changed
-  if (authStore.user && (authStore.user.name !== userData.name || authStore.user.email !== userData.email)) {
-    authStore.user = userData
-    localStorage.setItem('user', JSON.stringify(userData))
   }
 }
 
@@ -148,13 +145,63 @@ async function handleSave() {
     const response = await authApi.updateProfile({ name: editForm.name })
     if (response.success && response.data) {
       profile.value = response.data
-      syncStore(response.data)
+      authStore.setUser(response.data)
       isEditing.value = false
     }
   } catch (err: any) {
     error.value = err.message || '保存失败，请稍后再试'
   } finally {
     saving.value = false
+  }
+}
+
+function triggerAvatarUpload() {
+  fileInput.value?.click()
+}
+
+async function handleAvatarChange(e: Event) {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  // 限制文件类型
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (!allowedTypes.includes(file.type)) {
+    error.value = '仅支持 JPG/PNG 格式的图片'
+    if (fileInput.value) fileInput.value.value = ''
+    return
+  }
+
+  try {
+    isUploadingAvatar.value = true
+    error.value = ''
+
+    // 1. 压缩图片 (最大 400x400，头像不需要太大)
+    const compressedBlob = await compressImage(file, 400, 400, 0.7)
+    const compressedFile = new File([compressedBlob], file.name, {
+      type: 'image/jpeg'
+    })
+
+    // 2. 上传到 OSS
+    const uploadRes = await systemApi.uploadAvatar(compressedFile)
+    if (!uploadRes.success || !uploadRes.data) {
+      throw new Error(uploadRes.message || '头像上传失败')
+    }
+
+    // 3. 更新用户信息中的头像 Key
+    const updateRes = await authApi.updateProfile({ avatarKey: uploadRes.data.key })
+    if (updateRes.success && updateRes.data) {
+      profile.value = updateRes.data
+      authStore.setUser(updateRes.data)
+    } else {
+      throw new Error(updateRes.message || '更新头像信息失败')
+    }
+  } catch (err: any) {
+    error.value = err.message || '更新头像失败'
+    console.error('Avatar upload error:', err)
+  } finally {
+    isUploadingAvatar.value = false
+    if (fileInput.value) fileInput.value.value = ''
   }
 }
 
@@ -219,12 +266,34 @@ onUnmounted(() => {
       <div class="px-8 pb-8">
         <!-- 头像 -->
         <div class="relative flex justify-between items-end -mt-12 mb-6">
-          <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-md">
-            <div class="w-full h-full rounded-xl bg-blue-50 flex items-center justify-center">
-              <span class="text-3xl font-bold text-blue-600">
-                {{ (profile.name || profile.email).charAt(0).toUpperCase() }}
-              </span>
+          <div class="relative group">
+            <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-md">
+              <div class="w-full h-full rounded-xl bg-blue-50 flex items-center justify-center overflow-hidden">
+                <img v-if="profile.avatarUrl" :src="profile.avatarUrl" class="w-full h-full object-cover" />
+                <span v-else class="text-3xl font-bold text-blue-600">
+                  {{ (profile.name || profile.email).charAt(0).toUpperCase() }}
+                </span>
+              </div>
             </div>
+            <!-- 上传按钮 -->
+            <button 
+              @click="triggerAvatarUpload"
+              :disabled="isUploadingAvatar"
+              class="absolute inset-1 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1"
+            >
+              <div v-if="isUploadingAvatar" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+              <template v-else>
+                <span class="i-carbon-camera text-xl"></span>
+                <span class="text-[10px] font-medium">更换头像</span>
+              </template>
+            </button>
+            <input 
+              ref="fileInput"
+              type="file"
+              accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+              class="hidden"
+              @change="handleAvatarChange"
+            />
           </div>
           <div class="flex gap-2">
             <template v-if="!isEditing">

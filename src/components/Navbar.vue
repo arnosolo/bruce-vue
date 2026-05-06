@@ -67,8 +67,9 @@ function toggleMobileMenu() {
       <div class="hidden md:flex items-center gap-4">
         <template v-if="authStore.isAuthenticated">
           <RouterLink to="/profile" class="flex items-center gap-3 pr-4 border-r border-gray-200 no-underline hover:opacity-80 transition-opacity">
-            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-              <span class="text-xs font-bold text-gray-500">
+            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+              <img v-if="authStore.user?.avatarUrl" :src="authStore.user.avatarUrl" class="w-full h-full object-cover" />
+              <span v-else class="text-xs font-bold text-gray-500">
                 {{ (authStore.user?.name || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
               </span>
             </div>
@@ -140,8 +141,11 @@ function toggleMobileMenu() {
           @click="isMobileMenuOpen = false"
           class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50"
         >
-          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
-            {{ (authStore.user?.name || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
+          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold overflow-hidden">
+            <img v-if="authStore.user?.avatarUrl" :src="authStore.user.avatarUrl" class="w-full h-full object-cover" />
+            <template v-else>
+              {{ (authStore.user?.name || authStore.user?.email || 'U').charAt(0).toUpperCase() }}
+            </template>
           </div>
           <div>
             <div class="text-sm font-bold text-gray-900">{{ authStore.user?.name || '用户' }}</div>

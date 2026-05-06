@@ -5,6 +5,10 @@ export interface User {
   email: string
   /** 用户姓名 */
   name: string | null
+  /** OSS 中的头像路径 */
+  avatarKey?: string | null
+  /** 头像的可访问 URL */
+  avatarUrl?: string | null
   /** 创建时间 */
   createdAt: string
   /** 更新时间 */

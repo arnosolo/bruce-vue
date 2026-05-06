@@ -40,6 +40,8 @@ export interface ProfileResponse extends BaseResponse<User> {}
 export interface UpdateProfileParams {
   /** 用户姓名 */
   name?: string
+  /** OSS 中的头像路径 (例如 public/avatar/...) */
+  avatarKey?: string
 }
 
 /** 更新个人资料响应 */
