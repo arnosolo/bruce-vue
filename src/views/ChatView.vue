@@ -195,15 +195,30 @@ const formatMessageTime = (dateStr: string) => {
             </div>
             <div
               :class="[
-                'max-w-[85%] md:max-w-[70%] rounded-2xl shadow-sm overflow-hidden',
+                'max-w-[85%] md:max-w-[70%] rounded-2xl shadow-sm overflow-hidden relative group',
                 msg.type === 'IMAGE' ? 'p-0' : 'p-3 md:p-4',
-                msg.role === 'USER' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
+                msg.role === 'USER' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none',
+                msg.status === 'error' ? 'ring-2 ring-red-400' : ''
               ]"
             >
               <template v-if="msg.type === 'IMAGE'">
                 <img :src="msg.url || ''" alt="image message" class="max-w-full block cursor-zoom-in hover:opacity-90 transition-opacity" />
               </template>
               <div v-else class="text-sm md:text-base whitespace-pre-wrap break-words">{{ msg.content }}</div>
+
+              <!-- Status Indicators -->
+              <div v-if="msg.role === 'USER'" class="absolute -left-10 bottom-1 flex items-center gap-1">
+                <span v-if="msg.status === 'sending'" class="i-carbon-loading animate-spin text-blue-500 text-lg"></span>
+                <div v-if="msg.status === 'error'" class="flex items-center gap-1">
+                  <span class="i-carbon-warning-filled text-red-500 text-lg cursor-help" title="发送失败"></span>
+                  <button 
+                    @click="chatStore.retryMessage(msg)"
+                    class="text-[10px] bg-red-50 text-red-500 px-1.5 py-0.5 rounded hover:bg-red-100 transition shadow-sm border border-red-200"
+                  >
+                    重试
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div v-if="chatStore.isSending" class="flex flex-col items-start">

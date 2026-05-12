@@ -50,6 +50,8 @@ export interface Message {
   } | null
   /** 发送时间 */
   createdAt: string
+  /** 消息状态 (仅本地使用) */
+  status?: 'sending' | 'error'
 }
 
 /**

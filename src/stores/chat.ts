@@ -56,24 +56,33 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function sendMessage(content: string, type: MessageType = 'TEXT', attachmentKey?: string) {
+  async function sendMessage(content: string, type: MessageType = 'TEXT', attachmentKey?: string, messageId?: number) {
     if (!currentConversationId.value) return
     
     const conversationId = currentConversationId.value
-    // 1. 乐观更新：立即显示用户消息
-    const tempId = Date.now()
-    const tempUserMessage: Message = {
-      id: tempId,
-      content,
-      role: 'USER',
-      type,
-      attachmentKey: attachmentKey || null,
-      url: null, // 临时没有 URL
-      conversationId,
-      senderId: null, // 临时消息
-      createdAt: new Date().toISOString()
+    let tempId = messageId || Date.now()
+    
+    // 1. 乐观更新：立即显示用户消息或更新现有消息状态
+    if (!messageId) {
+      const tempUserMessage: Message = {
+        id: tempId,
+        content,
+        role: 'USER',
+        type,
+        attachmentKey: attachmentKey || null,
+        url: null,
+        conversationId,
+        senderId: null,
+        createdAt: new Date().toISOString(),
+        status: 'sending'
+      }
+      messages.value.push(tempUserMessage)
+    } else {
+      const index = messages.value.findIndex(m => m.id === messageId)
+      if (index !== -1) {
+        messages.value[index].status = 'sending'
+      }
     }
-    messages.value.push(tempUserMessage)
     
     isSending.value = true
     try {
@@ -82,7 +91,7 @@ export const useChatStore = defineStore('chat', () => {
         // 2. 替换临时消息并添加 AI 回复
         const index = messages.value.findIndex(m => m.id === tempId)
         if (index !== -1) {
-          messages.value[index] = res.data.userMessage
+          messages.value[index] = { ...res.data.userMessage, status: undefined }
         }
         messages.value.push(res.data.aiMessage)
 
@@ -95,12 +104,14 @@ export const useChatStore = defineStore('chat', () => {
         ) {
           summarizeConversationTitle(conversationId)
         }
+      } else {
+        throw new Error(res.message || '发送失败')
       }
     } catch (error) {
-      // 错误处理：如果发送失败，移除临时消息
+      // 错误处理：将消息状态标记为错误
       const index = messages.value.findIndex(m => m.id === tempId)
       if (index !== -1) {
-        messages.value.splice(index, 1)
+        messages.value[index].status = 'error'
       }
       console.error('Failed to send message:', error)
     } finally {
@@ -108,25 +119,33 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function sendStreamingMessage(content: string) {
+  async function sendStreamingMessage(content: string, messageId?: number) {
     if (!currentConversationId.value) return
 
     const conversationId = currentConversationId.value
+    let tempId = messageId || Date.now()
     
-    // 1. 乐观更新：用户消息
-    const tempId = Date.now()
-    const tempUserMessage: Message = {
-      id: tempId,
-      content,
-      role: 'USER',
-      type: 'TEXT',
-      attachmentKey: null,
-      url: null,
-      conversationId,
-      senderId: null,
-      createdAt: new Date().toISOString()
+    // 1. 乐观更新
+    if (!messageId) {
+      const tempUserMessage: Message = {
+        id: tempId,
+        content,
+        role: 'USER',
+        type: 'TEXT',
+        attachmentKey: null,
+        url: null,
+        conversationId,
+        senderId: null,
+        createdAt: new Date().toISOString(),
+        status: 'sending'
+      }
+      messages.value.push(tempUserMessage)
+    } else {
+      const index = messages.value.findIndex(m => m.id === messageId)
+      if (index !== -1) {
+        messages.value[index].status = 'sending'
+      }
     }
-    messages.value.push(tempUserMessage)
 
     // 2. 预占 AI 消息位
     const aiTempId = tempId + 1
@@ -149,6 +168,12 @@ export const useChatStore = defineStore('chat', () => {
         conversationId,
         content,
         (chunk) => {
+          // 处理用户消息状态更新（流开始时）
+          const userIdx = messages.value.findIndex(m => m.id === tempId)
+          if (userIdx !== -1 && messages.value[userIdx].status === 'sending') {
+            messages.value[userIdx].status = undefined
+          }
+
           // 处理流式内容
           if (chunk.content) {
             const index = messages.value.findIndex(m => m.id === aiTempId)
@@ -181,12 +206,20 @@ export const useChatStore = defineStore('chat', () => {
     } catch (error) {
       console.error('Streaming error:', error)
       const userIdx = messages.value.findIndex(m => m.id === tempId)
-      if (userIdx !== -1) messages.value.splice(userIdx, 1)
+      if (userIdx !== -1) messages.value[userIdx].status = 'error'
+      
       const aiIdx = messages.value.findIndex(m => m.id === aiTempId)
       if (aiIdx !== -1) messages.value.splice(aiIdx, 1)
     } finally {
       isSending.value = false
     }
+  }
+
+  async function retryMessage(message: Message) {
+    if (message.role !== 'USER') return
+    // 对于流式，目前业务上逻辑较复杂，先以常规消息重试为例
+    // 如果是图片消息
+    await sendMessage(message.content, message.type, message.attachmentKey || undefined, message.id)
   }
 
   async function summarizeConversationTitle(conversationId: number) {
@@ -225,6 +258,7 @@ export const useChatStore = defineStore('chat', () => {
     fetchMessages,
     sendMessage,
     sendStreamingMessage,
+    retryMessage,
     summarizeConversationTitle,
     setCurrentConversation
   }
