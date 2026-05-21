@@ -11,6 +11,7 @@ const router = useRouter()
 const navItems = [
   { name: '首页', path: '/' },
   { name: '聊天', path: '/chat' },
+  { name: '问题管理', path: '/faq-management' },
   { name: '关于', path: '/about' }
 ]
 

@@ -31,6 +31,11 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue')
     },
     {
+      path: '/faq-management',
+      name: 'faq-management',
+      component: () => import('../views/FaqManagementView.vue')
+    },
+    {
       path: '/docs/terms',
       name: 'terms',
       component: () => import('../views/docs/TermsView.vue')
