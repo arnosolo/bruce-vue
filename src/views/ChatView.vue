@@ -4,6 +4,7 @@ import { useChatStore } from '../stores/chat'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { systemApi } from '../api/system'
+import { renderMarkdown } from '../utils/markdown'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
@@ -205,7 +206,12 @@ const formatMessageTime = (dateStr: string) => {
                 <template v-if="msg.type === 'IMAGE'">
                   <img :src="msg.url || ''" alt="image message" class="max-w-full block cursor-zoom-in hover:opacity-90 transition-opacity" />
                 </template>
-                <div v-else class="text-sm md:text-base whitespace-pre-wrap break-words">{{ msg.content }}</div>
+                <div 
+                  v-else 
+                  class="markdown-body prose prose-sm max-w-none text-inherit"
+                  :class="[msg.role === 'USER' ? 'prose-invert' : '']"
+                  v-html="renderMarkdown(msg.content)"
+                ></div>
               </div>
 
               <!-- Status Indicators (Below bubble) -->
@@ -305,5 +311,36 @@ const formatMessageTime = (dateStr: string) => {
 }
 .overflow-y-auto:hover::-webkit-scrollbar-thumb {
   background: #e5e7eb;
+}
+
+/* Markdown 样式微调 */
+:deep(.markdown-body) {
+  word-break: break-word;
+}
+:deep(.markdown-body p) {
+  margin: 0;
+}
+:deep(.markdown-body p + p) {
+  margin-top: 0.5em;
+}
+:deep(.markdown-body ul), :deep(.markdown-body ol) {
+  padding-left: 1.25em;
+  margin: 0.5em 0;
+}
+:deep(.markdown-body li) {
+  margin: 0.25em 0;
+}
+:deep(.markdown-body pre) {
+  background: rgba(0,0,0,0.05);
+  padding: 0.75em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+:deep(.markdown-body code) {
+  background: rgba(0,0,0,0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 0.3em;
+  font-size: 0.9em;
 }
 </style>

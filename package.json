@@ -10,12 +10,16 @@
   },
   "dependencies": {
     "axios": "^1.15.0",
+    "dompurify": "^3.4.5",
+    "marked": "^18.0.4",
     "pinia": "^3.0.4",
     "vue": "^3.5.32",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.20",
+    "@types/dompurify": "^3.0.5",
+    "@types/marked": "^5.0.2",
     "@types/node": "^24.12.2",
     "@unocss/preset-icons": "^66.6.8",
     "@unocss/vite": "^66.6.8",
