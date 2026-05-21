@@ -1,4 +1,4 @@
-# AI 客户服务系统 (Vue 3 + TypeScript + Vite)
+# AI 客服
 
 这是一个基于 Vue 3、TypeScript 和 Vite 构建的 AI 客户服务系统前端项目。
 
@@ -68,7 +68,15 @@ npm run preview
 
 项目使用 `.env.development` 和 `.env.production` 文件进行环境配置。
 
-## 更多信息
+## 资源
+
+### 源码
+https://github.com/arnosolo/ai-customer-service-vue
+
+### 后端
+https://github.com/arnosolo/ai-customer-service
+
+### 参考文档
 
 - [Vue 3 官方文档](https://vuejs.org/)
 - [TypeScript 官方文档](https://www.typescriptlang.org/)
