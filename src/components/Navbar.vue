@@ -1,19 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { APP_NAME } from '../constants'
 import { useAuthStore } from '../stores/auth'
+import { UserRole } from '../types/userRole'
 import ConfirmModal from './ConfirmModal.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
 
-const navItems = [
-  { name: '首页', path: '/' },
-  { name: '聊天', path: '/chat' },
-  { name: '问题管理', path: '/faq-management' },
-  { name: '关于', path: '/about' }
-]
+const navItems = computed(() => {
+  const items = [
+    { name: '首页', path: '/' },
+    { name: '聊天', path: '/chat' }
+  ]
+  
+  const role = authStore.user?.role
+  
+  if (role === UserRole.Admin || role === UserRole.Agent) {
+    items.push({ name: '问题管理', path: '/faq-management' })
+  }
+  
+  if (role === UserRole.Admin) {
+    items.push({ name: '用户管理', path: '/user-management' })
+  }
+  
+  items.push({ name: '关于', path: '/about' })
+  return items
+})
 
 const showLogoutConfirm = ref(false)
 const isMobileMenuOpen = ref(false)

@@ -1,7 +1,8 @@
+import type { Pagination } from './api'
+
 /**
  * 常见问题 (FAQ) 相关的类型定义
  */
-
 export interface Faq {
   /** 问题 ID */
   id: number
@@ -29,16 +30,6 @@ export interface CreateFaqRequest {
 export interface UpdateFaqRequest {
   question?: string
   answer?: string
-}
-
-/**
- * 分页信息
- */
-export interface Pagination {
-  total: number
-  page: number
-  limit: number
-  totalPages: number
 }
 
 /**

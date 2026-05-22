@@ -1,3 +1,5 @@
+import type { UserRole } from "./userRole";
+
 export interface User {
   /** 用户唯一标识 ID */
   id: number
@@ -5,6 +7,8 @@ export interface User {
   email: string
   /** 用户姓名 */
   name: string | null
+  /** 用户角色 */
+  role: UserRole
   /** OSS 中的头像路径 */
   avatarKey?: string | null
   /** 头像的可访问 URL */

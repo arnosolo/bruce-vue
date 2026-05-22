@@ -7,6 +7,14 @@ import {
 export default defineConfig({
   shortcuts: [
   ],
+  // 由于角色图标是通过变量动态拼接的，UnoCSS 静态分析无法识别，
+  // 需要在此配置白名单以确保这些图标类始终被生成。
+  safelist: [
+    'i-carbon-user',
+    'i-carbon-headset',
+    'i-carbon-bot',
+    'i-carbon-user-settings',
+  ],
   presets: [
     presetUno(),
     presetIcons({

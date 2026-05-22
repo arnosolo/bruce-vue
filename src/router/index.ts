@@ -36,6 +36,11 @@ const router = createRouter({
       component: () => import('../views/FaqManagementView.vue')
     },
     {
+      path: '/user-management',
+      name: 'user-management',
+      component: () => import('../views/UserManagementView.vue')
+    },
+    {
       path: '/docs/terms',
       name: 'terms',
       component: () => import('../views/docs/TermsView.vue')
@@ -65,6 +70,12 @@ router.beforeEach((to, _, next) => {
     next({ name: 'auth' })
   } else if (authStore.isAuthenticated && to.name === 'auth') {
     // 如果已登录但访问的是认证页，重定向到首页
+    next({ name: 'home' })
+  } else if (authStore.isAuthenticated && to.name === 'user-management' && authStore.user?.role !== 'ADMIN') {
+    // 只有管理员能访问用户管理
+    next({ name: 'home' })
+  } else if (authStore.isAuthenticated && to.name === 'faq-management' && !['ADMIN', 'AGENT'].includes(authStore.user?.role || '')) {
+    // 只有管理员和客服能访问常见问题管理
     next({ name: 'home' })
   } else {
     // 其他情况放行

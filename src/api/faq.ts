@@ -1,6 +1,6 @@
 import http from '../utils/http'
 import type { BaseResponse } from '../types/api'
-import type { Faq, CreateFaqRequest, UpdateFaqRequest, FaqListResponse } from '../types/faq'
+import type { CreateFaqRequest, UpdateFaqRequest, FaqListResponse } from '../types/faq'
 
 /**
  * 常见问题 (FAQ) 相关的 API 调用

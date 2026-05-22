@@ -11,6 +11,16 @@ export interface BaseResponse<T = any> {
 }
 
 /**
+ * 分页信息
+ */
+export interface Pagination {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+/**
  * OSS 上传响应数据
  */
 export interface UploadResponse {
