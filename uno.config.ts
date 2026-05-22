@@ -14,6 +14,12 @@ export default defineConfig({
     'i-carbon-headset',
     'i-carbon-bot',
     'i-carbon-user-settings',
+    'i-carbon-chat',
+    'i-carbon-send-alt',
+    'i-carbon-user-favorite',
+    'i-carbon-grid',
+    'i-carbon-flash',
+    'i-carbon-logo-github',
   ],
   presets: [
     presetUno(),

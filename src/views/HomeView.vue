@@ -7,57 +7,196 @@ const authStore = useAuthStore()
 </script>
 
 <template>
-  <main class="min-h-[calc(100vh-64px)] bg-gradient-to-b from-white to-blue-50/30">
-    <div class="max-w-7xl mx-auto px-4 pt-12 pb-16 sm:px-6 lg:px-8 md:pt-20">
-      <div class="text-center">
-        <h1 class="text-3xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl tracking-tight leading-tight">
-          <span class="block">下一代</span>
-          <span class="block text-blue-600 mt-1 md:mt-2">AI 智能客服系统</span>
-        </h1>
-        <p class="mt-4 md:mt-6 max-w-2xl mx-auto text-base md:text-xl text-gray-500 leading-relaxed px-4">
-          基于最新大语言模型，为您的业务提供 7x24 小时全天候智能支持。
-          {{ APP_NAME }} 助力企业提升效率，降低成本。
-        </p>
-        <div class="mt-8 md:mt-10 flex flex-col sm:flex-row justify-center gap-4 px-6">
-          <RouterLink
-            :to="authStore.isAuthenticated ? '/chat' : '/auth'"
-            class="px-8 py-4 text-lg font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-lg shadow-blue-100 transition-all hover:scale-105 active:scale-95 text-center"
-          >
-            开始对话
-          </RouterLink>
-          <RouterLink
-            to="/about"
-            class="px-8 py-4 text-lg font-medium text-blue-600 bg-white border-2 border-blue-50 hover:border-blue-100 rounded-2xl transition-all text-center"
-          >
-            了解更多
-          </RouterLink>
-        </div>
+  <main class="min-h-[calc(100vh-64px)] bg-white overflow-hidden">
+    <!-- Hero Section -->
+    <div class="relative pt-12 pb-20 lg:pt-24 lg:pb-32">
+      <!-- Background Decoration -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60"></div>
+        <div class="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-indigo-50 rounded-full blur-[100px] opacity-60"></div>
       </div>
 
-      <!-- Feature Grid -->
-      <div class="mt-20 md:mt-24 grid grid-cols-1 gap-6 sm:gap-8 sm:grid-cols-3">
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100/50 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
-            <span class="i-carbon-flash text-blue-600 text-2xl"></span>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-8 animate-fade-in">
+            <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">AI-Powered Operations</span>
           </div>
-          <h3 class="text-lg md:text-xl font-bold text-gray-900">极速响应</h3>
-          <p class="mt-3 md:mt-4 text-gray-500 text-sm md:text-base">毫秒级流式响应，像与真人对话一样流畅自然。</p>
+          
+          <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-[1.1] mb-8">
+            <span class="block">对话，即是</span>
+            <span class="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-fill-transparent py-1">全能生产力</span>
+          </h1>
+          
+          <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
+            跳过繁琐的菜单与点击。在 {{ APP_NAME }} 中，只需一句简单的指令，AI 即可为您精准执行业务操作。
+          </p>
+
+          <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <RouterLink
+              :to="authStore.isAuthenticated ? '/chat' : '/auth'"
+              class="w-full sm:w-auto px-10 py-4 text-lg font-bold text-white bg-gray-900 hover:bg-blue-600 rounded-2xl shadow-2xl shadow-gray-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3"
+            >
+              <span>立即开始对话</span>
+              <span class="i-carbon-arrow-right text-xl"></span>
+            </RouterLink>
+            <RouterLink
+              to="/about"
+              class="w-full sm:w-auto px-10 py-4 text-lg font-bold text-gray-600 bg-white border-2 border-gray-100 hover:border-blue-200 hover:text-blue-600 rounded-2xl transition-all flex items-center justify-center gap-2"
+            >
+              了解工作原理
+            </RouterLink>
+          </div>
         </div>
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100/50 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6">
-            <span class="i-carbon-chip text-indigo-600 text-2xl"></span>
+
+        <!-- Mockup / Preview -->
+        <div class="mt-20 relative animate-fade-in-up">
+          <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[2.5rem] blur opacity-20"></div>
+          <div class="relative bg-white border border-gray-100 rounded-[2rem] shadow-2xl overflow-hidden aspect-[16/9] lg:aspect-[21/9] flex">
+            <!-- Simulated Sidebar -->
+            <div class="w-16 lg:w-64 bg-gray-50 border-r border-gray-100 p-4 flex flex-col gap-4 hidden sm:flex">
+              <div class="flex items-center gap-3 px-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-blue-600"></div>
+                <div class="h-4 w-24 bg-gray-200 rounded hidden lg:block"></div>
+              </div>
+              <div v-for="i in 5" :key="i" class="flex items-center gap-3 px-2">
+                <div class="w-8 h-8 rounded-lg bg-gray-200 flex-shrink-0"></div>
+                <div class="h-3 w-full bg-gray-100 rounded hidden lg:block"></div>
+              </div>
+            </div>
+
+            <!-- Simulated Main Content -->
+            <div class="flex-1 p-6 lg:p-10 bg-white relative overflow-hidden">
+              <div class="flex flex-col gap-8">
+                <!-- Header -->
+                <div class="flex justify-between items-end">
+                  <div class="space-y-2">
+                    <div class="h-6 w-32 bg-gray-200 rounded"></div>
+                    <div class="h-4 w-48 bg-gray-100 rounded"></div>
+                  </div>
+                  <div class="h-10 w-32 bg-gray-100 rounded-xl"></div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-3 gap-6">
+                  <div v-for="i in 3" :key="i" class="p-6 border border-gray-100 rounded-2xl space-y-4">
+                    <div class="w-10 h-10 rounded-xl bg-gray-50"></div>
+                    <div class="h-4 w-20 bg-gray-200 rounded"></div>
+                    <div class="h-8 w-16 bg-gray-100 rounded"></div>
+                  </div>
+                </div>
+
+                <!-- Big Chart Placeholder -->
+                <div class="flex-1 min-h-[200px] bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 flex items-end p-8 gap-4">
+                  <div v-for="i in 12" :key="i" 
+                    class="flex-1 bg-blue-100 rounded-t-lg transition-all"
+                    :style="{ height: `${Math.random() * 60 + 20}%` }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- AI Interaction Overlay (The Highlight) -->
+              <div class="absolute inset-0 bg-blue-900/5 backdrop-blur-[2px] flex items-center justify-center p-6">
+                <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-blue-100 overflow-hidden animate-float">
+                  <div class="p-4 bg-blue-600 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="i-carbon-bot text-xl"></span>
+                      <span class="text-sm font-bold">智能助手正在操作</span>
+                    </div>
+                    <div class="flex gap-1">
+                      <div class="w-2 h-2 rounded-full bg-white/40"></div>
+                      <div class="w-2 h-2 rounded-full bg-white/40"></div>
+                    </div>
+                  </div>
+                  <div class="p-6 space-y-4">
+                    <div class="flex gap-3">
+                      <div class="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0"></div>
+                      <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-xs text-gray-600 leading-relaxed">
+                        帮我查看上周的活跃用户增长情况，并生成一份分析报告。
+                      </div>
+                    </div>
+                    <div class="flex gap-3 justify-end">
+                      <div class="bg-blue-50 p-3 rounded-2xl rounded-tr-none text-xs text-blue-700 leading-relaxed border border-blue-100">
+                        正在为您调取数据... 已识别意图：<b>[活跃用户分析]</b>。分析图表已在后台更新，报告已准备就绪。
+                      </div>
+                      <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-white">
+                        <span class="i-carbon-bot text-xs"></span>
+                      </div>
+                    </div>
+                    <div class="pt-2 flex justify-end">
+                      <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-blue-200">
+                        执行：更新仪表盘
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-lg md:text-xl font-bold text-gray-900">深度理解</h3>
-          <p class="mt-3 md:mt-4 text-gray-500 text-sm md:text-base">理解复杂的业务逻辑，提供精准的问题解决方案。</p>
         </div>
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100/50 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6">
-            <span class="i-carbon-security text-emerald-600 text-2xl"></span>
+      </div>
+    </div>
+
+    <!-- Quick Features -->
+    <div class="max-w-7xl mx-auto px-4 pb-24 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="group">
+          <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+            <span class="i-carbon-chat text-3xl"></span>
           </div>
-          <h3 class="text-lg md:text-xl font-bold text-gray-900">安全可靠</h3>
-          <p class="mt-3 md:mt-4 text-gray-500 text-sm md:text-base">企业级加密与数据保护，确保您的对话信息安全。</p>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">自然语言交互</h3>
+          <p class="text-gray-500 leading-relaxed">告别复杂的 UI 路径，用最直觉的语言直接驱动后台功能。</p>
+        </div>
+        <div class="group">
+          <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+            <span class="i-carbon-activity text-3xl"></span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">意图驱动引擎</h3>
+          <p class="text-gray-500 leading-relaxed">智能解析用户真实意图，自动匹配最佳业务流程，响应快如闪电。</p>
+        </div>
+        <div class="group">
+          <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+            <span class="i-carbon-locked text-3xl"></span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">企业级私有化</h3>
+          <p class="text-gray-600 leading-relaxed">严格的数据权限控制与加密机制，确保每一句对话的私密与安全。</p>
         </div>
       </div>
     </div>
   </main>
 </template>
+
+<style scoped>
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.text-fill-transparent {
+  -webkit-text-fill-color: transparent;
+}
+</style>
+
