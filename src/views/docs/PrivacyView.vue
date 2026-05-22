@@ -1,5 +1,6 @@
 <template>
-  <div class="max-w-3xl mx-auto py-12 px-6">
+  <div class="w-full flex justify-center">
+    <div class="max-w-3xl w-full py-12 px-6">
     <button @click="$router.back()" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-8 transition-colors border-none bg-transparent cursor-pointer">
       <div class="i-carbon-arrow-left"></div>
       返回
@@ -20,5 +21,6 @@
         <p>我们采用先进的加密技术保护您的个人隐私，绝不会在未经许可的情况下将您的数据泄露给任何第三方机构。</p>
       </section>
     </article>
+    </div>
   </div>
 </template>

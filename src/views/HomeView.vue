@@ -9,14 +9,14 @@ const authStore = useAuthStore()
 <template>
   <main class="min-h-[calc(100vh-64px)] bg-white overflow-hidden">
     <!-- Hero Section -->
-    <div class="relative pt-12 pb-20 lg:pt-24 lg:pb-32">
+    <div class="relative pt-12 pb-20 lg:pt-24 lg:pb-32 flex flex-col items-center">
       <!-- Background Decoration -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
         <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-50 rounded-full blur-[120px] opacity-60"></div>
         <div class="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-indigo-50 rounded-full blur-[100px] opacity-60"></div>
       </div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-8 animate-fade-in">
             <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
@@ -138,28 +138,30 @@ const authStore = useAuthStore()
     </div>
 
     <!-- Quick Features -->
-    <div class="max-w-7xl mx-auto px-4 pb-24 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="group">
-          <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-            <span class="i-carbon-chat text-3xl"></span>
+    <div class="w-full flex justify-center">
+      <div class="max-w-7xl w-full px-4 pb-24 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div class="group">
+            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+              <span class="i-carbon-chat text-3xl"></span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">自然语言交互</h3>
+            <p class="text-gray-500 leading-relaxed">告别复杂的 UI 路径，用最直觉的语言直接驱动后台功能。</p>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">自然语言交互</h3>
-          <p class="text-gray-500 leading-relaxed">告别复杂的 UI 路径，用最直觉的语言直接驱动后台功能。</p>
-        </div>
-        <div class="group">
-          <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-            <span class="i-carbon-activity text-3xl"></span>
+          <div class="group">
+            <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+              <span class="i-carbon-activity text-3xl"></span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">意图驱动引擎</h3>
+            <p class="text-gray-500 leading-relaxed">智能解析用户真实意图，自动匹配最佳业务流程，响应快如闪电。</p>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">意图驱动引擎</h3>
-          <p class="text-gray-500 leading-relaxed">智能解析用户真实意图，自动匹配最佳业务流程，响应快如闪电。</p>
-        </div>
-        <div class="group">
-          <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-            <span class="i-carbon-locked text-3xl"></span>
+          <div class="group">
+            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+              <span class="i-carbon-locked text-3xl"></span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">企业级私有化</h3>
+            <p class="text-gray-600 leading-relaxed">严格的数据权限控制与加密机制，确保每一句对话的私密与安全。</p>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">企业级私有化</h3>
-          <p class="text-gray-600 leading-relaxed">严格的数据权限控制与加密机制，确保每一句对话的私密与安全。</p>
         </div>
       </div>
     </div>
@@ -199,4 +201,3 @@ const authStore = useAuthStore()
   -webkit-text-fill-color: transparent;
 }
 </style>
-

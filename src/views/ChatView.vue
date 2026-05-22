@@ -216,7 +216,7 @@ const formatMessageTime = (dateStr: string) => {
 
               <!-- Status Indicators (Below bubble) -->
               <div v-if="msg.role === 'USER' && (msg.status === 'sending' || msg.status === 'error')" class="mt-1.5 flex items-center justify-end px-1">
-                <span v-if="msg.status === 'sending'" class="i-carbon-loading animate-spin text-blue-500 text-lg"></span>
+                <span v-if="msg.status === 'sending'" class="i-carbon-progress-bar-round animate-spin text-blue-500 text-lg"></span>
                 <button 
                   v-if="msg.status === 'error'"
                   @click="chatStore.retryMessage(msg)"
@@ -257,7 +257,7 @@ const formatMessageTime = (dateStr: string) => {
               class="w-12 h-12 flex-shrink-0 bg-gray-100 text-gray-500 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center disabled:opacity-50"
               title="发送图片"
             >
-              <span v-if="isUploading" class="i-carbon-loading animate-spin text-xl"></span>
+              <span v-if="isUploading" class="i-carbon-progress-bar-round animate-spin text-xl"></span>
               <span v-else class="i-carbon-image text-xl"></span>
             </button>
             <textarea

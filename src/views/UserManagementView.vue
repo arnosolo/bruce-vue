@@ -94,8 +94,9 @@ onMounted(() => fetchUsers(1))
 </script>
 
 <template>
-  <div class="max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+  <div class="w-full flex justify-center">
+    <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">用户管理</h1>
         <p class="mt-1 text-sm text-gray-500">查看用户列表并管理用户权限角色</p>
@@ -349,9 +350,9 @@ onMounted(() => fetchUsers(1))
         </div>
       </div>
     </Transition>
-  </div>
-</template>
-
+    </div>
+    </div>
+    </template>
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {

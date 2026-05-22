@@ -129,8 +129,9 @@ onMounted(() => fetchFaqs(1))
 </script>
 
 <template>
-  <div class="max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+  <div class="w-full flex justify-center">
+    <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">常见问题管理</h1>
         <p class="mt-1 text-sm text-gray-500">管理展示在客户端的常见问题与解答</p>
@@ -322,6 +323,7 @@ onMounted(() => fetchFaqs(1))
       @confirm="handleDelete"
       @cancel="showDeleteConfirm = false"
     />
+    </div>
   </div>
 </template>
 

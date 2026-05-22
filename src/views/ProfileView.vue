@@ -241,11 +241,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="max-w-3xl mx-auto py-10 px-4">
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900">个人中心</h1>
-      <p class="text-gray-500 mt-1">管理您的账户信息和偏好设置</p>
-    </div>
+  <div class="w-full flex justify-center">
+    <div class="max-w-3xl w-full py-10 px-4">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">个人中心</h1>
+        <p class="text-gray-500 mt-1">管理您的账户信息和偏好设置</p>
+      </div>
 
     <div v-if="loading" class="flex justify-center py-20">
       <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -505,5 +506,6 @@ onUnmounted(() => {
       @confirm="handleDeleteAccount"
       @cancel="showDeleteConfirm = false"
     />
+    </div>
   </div>
 </template>
