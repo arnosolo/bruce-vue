@@ -101,31 +101,34 @@ const authStore = useAuthStore()
                   <div class="p-4 bg-blue-600 text-white flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="i-carbon-bot text-xl"></span>
-                      <span class="text-sm font-bold">智能助手正在操作</span>
+                      <span class="text-sm font-bold">AI 助手</span>
                     </div>
                     <div class="flex gap-1">
                       <div class="w-2 h-2 rounded-full bg-white/40"></div>
                       <div class="w-2 h-2 rounded-full bg-white/40"></div>
                     </div>
                   </div>
-                  <div class="p-6 space-y-4">
+                  <div class="p-6 space-y-4 bg-gray-50">
                     <div class="flex gap-3">
-                      <div class="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0"></div>
-                      <div class="bg-gray-100 p-3 rounded-2xl rounded-tl-none text-xs text-gray-600 leading-relaxed">
-                        帮我查看上周的活跃用户增长情况，并生成一份分析报告。
+                      <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-white shadow-sm">
+                        <span class="i-carbon-bot text-xs"></span>
+                      </div>
+                      <div class="bg-white p-3 rounded-2xl rounded-tl-none text-xs text-gray-800 leading-relaxed border border-gray-100 shadow-sm">
+                        您好！我是您的智能助手。有什么我可以帮您的吗？
                       </div>
                     </div>
                     <div class="flex gap-3 justify-end">
-                      <div class="bg-blue-50 p-3 rounded-2xl rounded-tr-none text-xs text-blue-700 leading-relaxed border border-blue-100">
-                        正在为您调取数据... 已识别意图：<b>[活跃用户分析]</b>。分析图表已在后台更新，报告已准备就绪。
+                      <div class="bg-blue-600 p-3 rounded-2xl rounded-tr-none text-xs text-white leading-relaxed shadow-sm">
+                        把我的名字改成大黄
                       </div>
-                      <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-white">
+                      <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 shadow-sm"></div>
+                    </div>
+                    <div class="flex gap-3">
+                      <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center text-white shadow-sm">
                         <span class="i-carbon-bot text-xs"></span>
                       </div>
-                    </div>
-                    <div class="pt-2 flex justify-end">
-                      <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg shadow-lg shadow-blue-200">
-                        执行：更新仪表盘
+                      <div class="bg-white p-3 rounded-2xl rounded-tl-none text-xs text-gray-800 leading-relaxed border border-gray-100 shadow-sm">
+                        好的，我已经将您的名字更改为大黄。
                       </div>
                     </div>
                   </div>
