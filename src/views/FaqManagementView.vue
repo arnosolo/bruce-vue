@@ -28,6 +28,7 @@ const formData = reactive<CreateFaqRequest>({
   answer: ''
 })
 const isSubmitting = ref(false)
+const isRebuilding = ref(false)
 
 async function fetchFaqs(page = pagination.value.page) {
   loading.value = true
@@ -101,6 +102,26 @@ async function handleDelete() {
   }
 }
 
+async function handleRebuildVectors() {
+  if (!confirm('确定要重新生成所有 FAQ 的向量吗？这可能需要一些时间。')) return
+  
+  isRebuilding.value = true
+  try {
+    const res = await faqApi.rebuildFaqVectors({
+      force: true,
+    })
+    if (res.success) {
+      alert(res.message || '向量重构任务已启动')
+    } else {
+      alert(res.message || '操作失败')
+    }
+  } catch (err: any) {
+    alert(err.message || '请求失败')
+  } finally {
+    isRebuilding.value = false
+  }
+}
+
 async function handleSubmit() {
   if (!formData.question || !formData.answer) return
   isSubmitting.value = true
@@ -156,6 +177,16 @@ onMounted(() => fetchFaqs(1))
           >
             <span v-if="loading" class="i-carbon-progress-bar-round animate-spin"></span>
             搜索
+          </button>
+          <button 
+            @click="handleRebuildVectors"
+            :disabled="isRebuilding"
+            class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors whitespace-nowrap text-sm font-bold disabled:opacity-50"
+            title="重新生成所有 FAQ 的向量，用于向量搜索"
+          >
+            <span v-if="isRebuilding" class="i-carbon-progress-bar-round animate-spin"></span>
+            <span v-else class="i-carbon-renew text-xl"></span>
+            <span>重构向量</span>
           </button>
           <button 
             @click="openAddModal"
@@ -218,6 +249,9 @@ onMounted(() => fetchFaqs(1))
                 <div class="flex items-center gap-3 mb-3">
                   <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
                     ID: {{ faq.id }}
+                  </span>
+                  <span v-if="faq.embeddingModel" class="bg-gray-50 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-100 font-medium" :title="'向量化模型: ' + faq.embeddingModel">
+                    {{ faq.embeddingModel }}
                   </span>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">

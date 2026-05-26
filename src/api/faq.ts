@@ -32,5 +32,12 @@ export const faqApi = {
    */
   deleteFaq(id: number): Promise<BaseResponse<void>> {
     return http.delete(`/faqs/${id}`)
+  },
+
+  /**
+   * 重新生成所有 FAQ 的向量
+   */
+  rebuildFaqVectors(params?: { force?: boolean }): Promise<BaseResponse<void>> {
+    return http.post('/faqs/rebuild', {}, { params })
   }
 }

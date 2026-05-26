@@ -20,6 +20,7 @@ export default defineConfig({
     'i-carbon-grid',
     'i-carbon-flash',
     'i-carbon-logo-github',
+    'i-carbon-renew',
   ],
   presets: [
     presetUno(),

@@ -10,6 +10,8 @@ export interface Faq {
   question: string
   /** 回答内容 */
   answer: string
+  /** 向量化模型 */
+  embeddingModel?: string
   /** 创建时间 */
   createdAt: string
   /** 更新时间 */
