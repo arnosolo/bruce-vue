@@ -11,8 +11,6 @@ import type {
   ChangePasswordResponse, 
   DeleteAccountResponse 
 } from '../types/auth'
-import type { User } from '../types/user'
-import type { BaseResponse } from '../types/api'
 
 /**
  * 身份认证相关的 API 调用
