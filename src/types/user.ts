@@ -1,4 +1,5 @@
 import type { UserRole } from "./userRole";
+import type { BaseResponse, Pagination } from "./api";
 
 export interface User {
   /** 用户唯一标识 ID */
@@ -17,4 +18,20 @@ export interface User {
   createdAt: string
   /** 更新时间 */
   updatedAt: string
+}
+
+export interface UserListParams {
+  page?: number
+  limit?: number
+  search?: string
+  role?: UserRole
+}
+
+export interface UserListResponse extends BaseResponse<{
+  list: User[]
+  pagination: Pagination
+}> {}
+
+export interface UpdateUserRoleParams {
+  role: UserRole
 }

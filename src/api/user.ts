@@ -1,23 +1,11 @@
 import http from '../utils/http'
-import type { User } from '../types/user'
-import type { UserRole } from '../types/userRole'
-import type { BaseResponse, Pagination } from '../types/api'
-
-export interface UserListParams {
-  page?: number
-  limit?: number
-  search?: string
-  role?: UserRole
-}
-
-export interface UserListResponse extends BaseResponse<{
-  list: User[]
-  pagination: Pagination
-}> {}
-
-export interface UpdateUserRoleParams {
-  role: UserRole
-}
+import type { 
+  User, 
+  UserListParams, 
+  UserListResponse, 
+  UpdateUserRoleParams 
+} from '../types/user'
+import type { BaseResponse } from '../types/api'
 
 export const userApi = {
   /**

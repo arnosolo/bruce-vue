@@ -1,6 +1,12 @@
 import http from '../utils/http'
 import type { BaseResponse } from '../types/api'
-import type { CreateFaqRequest, UpdateFaqRequest, FaqListResponse } from '../types/faq'
+import type { 
+  CreateFaqRequest, 
+  UpdateFaqRequest, 
+  FaqListResponse, 
+  FaqListParams, 
+  RebuildFaqVectorsParams 
+} from '../types/faq'
 
 /**
  * 常见问题 (FAQ) 相关的 API 调用
@@ -9,7 +15,7 @@ export const faqApi = {
   /**
    * 获取常见问题列表
    */
-  getFaqs(params?: { page?: number; limit?: number; keyword?: string }): Promise<BaseResponse<FaqListResponse>> {
+  getFaqs(params?: FaqListParams): Promise<BaseResponse<FaqListResponse>> {
     return http.get('/faqs', { params })
   },
 
@@ -37,7 +43,7 @@ export const faqApi = {
   /**
    * 重新生成所有 FAQ 的向量
    */
-  rebuildFaqVectors(params?: { force?: boolean }): Promise<BaseResponse<void>> {
+  rebuildFaqVectors(params?: RebuildFaqVectorsParams): Promise<BaseResponse<void>> {
     return http.post('/faqs/rebuild', {}, { params })
   }
 }

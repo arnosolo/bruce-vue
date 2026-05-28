@@ -35,6 +35,22 @@ export interface UpdateFaqRequest {
 }
 
 /**
+ * 常见问题列表请求参数
+ */
+export interface FaqListParams {
+  page?: number
+  limit?: number
+  keyword?: string
+}
+
+/**
+ * 重新生成向量请求参数
+ */
+export interface RebuildFaqVectorsParams {
+  force?: boolean
+}
+
+/**
  * 常见问题列表响应
  */
 export interface FaqListResponse {

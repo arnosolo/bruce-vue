@@ -81,6 +81,29 @@ export interface Pagination {
 }
 
 /**
+ * 会话列表请求参数
+ */
+export interface ConversationListParams {
+  page?: number
+  limit?: number
+}
+
+/**
+ * 消息列表请求参数
+ */
+export interface MessageListParams {
+  cursor?: number
+  limit?: number
+}
+
+/**
+ * 总结标题响应
+ */
+export interface SummarizeTitleResponse {
+  title: string
+}
+
+/**
  * 会话列表响应数据
  */
 export interface ConversationListResponse {

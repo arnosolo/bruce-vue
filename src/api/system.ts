@@ -1,13 +1,6 @@
 import http from '../utils/http'
 import type { BaseResponse, UploadResponse } from '../types/api'
-
-export interface HealthData {
-  status: string
-  database: string
-}
-
-/** 健康检查响应 */
-export interface HealthResponse extends BaseResponse<HealthData> {}
+import type { HealthResponse } from '../types/system'
 
 export const systemApi = {
   /**

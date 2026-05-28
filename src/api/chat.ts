@@ -7,7 +7,10 @@ import type {
   MessageListResponse,
   SendMessageResponse,
   SendMessageRequest,
-  StreamChunk
+  StreamChunk,
+  ConversationListParams,
+  MessageListParams,
+  SummarizeTitleResponse
 } from '../types/chat'
 
 /**
@@ -17,7 +20,7 @@ export const chatApi = {
   /**
    * 获取会话列表
    */
-  getConversations(params: { page?: number; limit?: number }): Promise<BaseResponse<ConversationListResponse>> {
+  getConversations(params: ConversationListParams): Promise<BaseResponse<ConversationListResponse>> {
     return http.get('/conversations', { params })
   },
 
@@ -33,7 +36,7 @@ export const chatApi = {
    */
   getMessages(
     conversationId: number,
-    params: { cursor?: number; limit?: number }
+    params: MessageListParams
   ): Promise<BaseResponse<MessageListResponse>> {
     return http.get(`/conversations/${conversationId}/messages`, { params })
   },
@@ -51,7 +54,7 @@ export const chatApi = {
   /**
    * 自动总结会话标题
    */
-  summarizeTitle(conversationId: number): Promise<BaseResponse<{ title: string }>> {
+  summarizeTitle(conversationId: number): Promise<BaseResponse<SummarizeTitleResponse>> {
     return http.post(`/conversations/${conversationId}/summarize-title`)
   },
 
