@@ -5,6 +5,7 @@ import { APP_NAME } from '../constants'
 import { useAuthStore } from '../stores/auth'
 import { UserRole } from '../types/userRole'
 import ConfirmModal from './ConfirmModal.vue'
+import app_icon from "../assets/app-icon-256.jpg";
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -53,9 +54,7 @@ function toggleMobileMenu() {
     <nav class="flex h-16 items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2 no-underline group" exact-active-class="none">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-          <span class="text-white font-bold text-xl">AI</span>
-        </div>
+        <img :src="app_icon" alt="App icon" class="w-8 h-8 rounded-lg transition-transform group-hover:scale-105">
         <span class="font-bold text-gray-900 text-lg tracking-tight">{{ APP_NAME }}</span>
       </RouterLink>
       

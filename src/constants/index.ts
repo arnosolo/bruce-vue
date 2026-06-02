@@ -1,5 +1,5 @@
-export const APP_NAME = '智能客服'
-export const APP_FULL_NAME = '智能客服系统'
+export const APP_NAME = '聪明小黄'
+export const APP_FULL_NAME = '聪明小黄'
 export const APP_VERSION = '1.0.0'
 export const SOURCE_CODE_URL = 'https://github.com/arnosolo/ai-customer-service-vue'
 
