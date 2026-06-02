@@ -1,4 +1,4 @@
-# AI 客服
+# 聪明小黄 Web 前端
 
 这是一个基于 Vue 3、TypeScript 和 Vite 构建的 AI 客户服务系统前端项目。
 
