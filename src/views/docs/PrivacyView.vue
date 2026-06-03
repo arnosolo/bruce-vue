@@ -8,7 +8,7 @@
     
     <article class="prose prose-slate lg:prose-lg mx-auto">
       <h1 class="text-3xl font-bold mb-6">隐私政策</h1>
-      <p class="text-gray-600 mb-4">最后更新日期：2026年4月18日</p>
+      <p class="text-gray-600 mb-4">最后更新日期：2026年6月3日</p>
       
       <section class="space-y-6 text-gray-700 leading-relaxed">
         <h2 class="text-xl font-semibold text-gray-900">1. 数据收集</h2>
@@ -18,7 +18,7 @@
         <p>收集的信息主要用于优化 AI 回复质量、提供个性化支持以及确保您的账号安全。</p>
         
         <h2 class="text-xl font-semibold text-gray-900">3. 隐私保护</h2>
-        <p>我们采用先进的加密技术保护您的个人隐私，绝不会在未经许可的情况下将您的数据泄露给任何第三方机构。</p>
+        <p>我们不会在未经许可的情况下将您的数据泄露给任何第三方机构。</p>
       </section>
     </article>
     </div>
