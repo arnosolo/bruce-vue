@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useAuthStore } from '../stores/auth'
+import { PATH_ROLE_MAP, PUBLIC_PATH_PREFIXES, PUBLIC_PATHS } from './config.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,27 +61,33 @@ const router = createRouter({
 
 // 全局路由守卫
 router.beforeEach((to, _, next) => {
-  const authStore = useAuthStore()
-  
-  // 判断是否为公共页面：auth 页，404 页，或者以 /docs/ 开头的页面
-  const isPublicPage = to.name === 'auth' || to.name === 'not-found' || to.path.startsWith('/docs/')
-  
-  if (!isPublicPage && !authStore.isAuthenticated) {
-    // 如果不是公共页面且未登录，重定向到认证页
-    next({ name: 'auth' })
-  } else if (authStore.isAuthenticated && to.name === 'auth') {
-    // 如果已登录但访问的是认证页，重定向到首页
-    next({ name: 'home' })
-  } else if (authStore.isAuthenticated && to.name === 'user-management' && authStore.user?.role !== 'ADMIN') {
-    // 只有管理员能访问用户管理
-    next({ name: 'home' })
-  } else if (authStore.isAuthenticated && to.name === 'faq-management' && !['ADMIN', 'AGENT'].includes(authStore.user?.role || '')) {
-    // 只有管理员和客服能访问常见问题管理
-    next({ name: 'home' })
-  } else {
-    // 其他情况放行
-    next()
+  const { isAuthenticated, user } = useAuthStore()
+  const userRole = user?.role ?? ''
+  const currentPath = to.path
+
+  // 判断是否公开页面
+  const is404 = to.matched.some(record => record.path === '/:pathMatch(.*)*')
+  const isExactPublic = PUBLIC_PATHS.has(currentPath)
+  const isPrefixPublic = PUBLIC_PATH_PREFIXES.some(prefix => currentPath.startsWith(prefix))
+  const isPublic = isExactPublic || isPrefixPublic || is404
+
+  // 公开页面直接放行
+  if (isPublic) {
+    return next()
   }
+
+  // 未登录拦截
+  if (!isAuthenticated) {
+    return next({ path: '/auth' })
+  }
+
+  // 角色权限校验
+  const allowRoles = PATH_ROLE_MAP[currentPath]
+  if (allowRoles && !allowRoles.includes(userRole)) {
+    return next({ path: '/' })
+  }
+
+  next()
 })
 
 export default router
