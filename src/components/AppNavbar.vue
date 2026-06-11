@@ -26,7 +26,6 @@ const navItems = computed(() => {
     items.push({ name: '用户管理', path: '/user-management' })
   }
   
-  items.push({ name: '关于', path: '/about' })
   return items
 })
 

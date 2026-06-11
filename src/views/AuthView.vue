@@ -4,12 +4,13 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api/auth'
 import { systemApi } from '../api/system'
+import { SystemStatus, SYSTEM_STATUS_CONFIG } from '../types/system'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 // 服务器状态
-const serverStatus = ref<'online' | 'offline' | 'checking'>('checking')
+const serverStatus = ref<SystemStatus>(SystemStatus.Checking)
 
 // 状态控制：'login' | 'register'
 const mode = ref<'login' | 'register'>('login')
@@ -28,9 +29,9 @@ const error = ref('')
 async function checkServer() {
   try {
     const res = await systemApi.getHealth()
-    serverStatus.value = res.success ? 'online' : 'offline'
+    serverStatus.value = res.success ? SystemStatus.Online : SystemStatus.Offline
   } catch (err) {
-    serverStatus.value = 'offline'
+    serverStatus.value = SystemStatus.Offline
   }
 }
 
@@ -203,15 +204,11 @@ const submitText = computed(() => {
         <!-- 服务器状态显示 -->
         <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 border border-gray-100 shadow-sm">
           <div 
-            class="w-2 h-2 rounded-full animate-pulse"
-            :class="{
-              'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]': serverStatus === 'online',
-              'bg-red-500': serverStatus === 'offline',
-              'bg-yellow-500': serverStatus === 'checking'
-            }"
+            class="w-2 h-2 rounded-full"
+            :class="SYSTEM_STATUS_CONFIG[serverStatus].dotClass"
           ></div>
           <span class="text-[10px] font-medium uppercase tracking-wider text-gray-500">
-            服务器状态: {{ serverStatus === 'online' ? '在线' : serverStatus === 'offline' ? '离线' : '检查中' }}
+            {{ SYSTEM_STATUS_CONFIG[serverStatus].text }}
           </span>
         </div>
       </div>

@@ -1,10 +1,33 @@
 <script setup lang="ts">
-import { APP_NAME } from '../constants'
+import { APP_NAME, APP_VERSION, SOURCE_CODE_URL } from '../constants'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { USER_ROLE_CONFIG } from '../types/userRole';
 
 const authStore = useAuthStore()
+
+const features = [
+  {
+    title: '对话即操作',
+    description: '无需寻找复杂的菜单，直接告诉 AI 你的需求。从查询信息到修改设置，一切操作都在对话中完成。',
+    icon: 'i-carbon-chat'
+  },
+  {
+    title: '意图精准识别',
+    description: '深度理解自然语言，精准捕获用户意图。将繁琐的多步点击简化为一句简单的指令。',
+    icon: 'i-carbon-send-alt'
+  },
+  {
+    title: '零学习成本',
+    description: '摆脱传统图形界面的束缚，用最自然的交流方式使用系统。让每一位用户都能像操作专家一样高效。',
+    icon: 'i-carbon-user-favorite'
+  },
+  {
+    title: '全场景覆盖',
+    description: '无论是业务咨询、故障排查还是后台管理，AI 都能成为你最得力的交互入口。',
+    icon: 'i-carbon-grid'
+  }
+]
 </script>
 
 <template>
@@ -40,12 +63,6 @@ const authStore = useAuthStore()
             >
               <span>立即开始对话</span>
               <span class="i-carbon-arrow-right text-xl"></span>
-            </RouterLink>
-            <RouterLink
-              to="/about"
-              class="w-full sm:w-auto px-10 py-4 text-lg font-bold text-gray-600 bg-white border-2 border-gray-100 hover:border-blue-200 hover:text-blue-600 rounded-2xl transition-all flex items-center justify-center gap-2"
-            >
-              了解工作原理
             </RouterLink>
           </div>
         </div>
@@ -141,34 +158,66 @@ const authStore = useAuthStore()
       </div>
     </div>
 
-    <!-- Quick Features -->
-    <div class="w-full flex justify-center">
-      <div class="max-w-7xl w-full px-4 pb-24 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div class="group">
-            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-              <span class="i-carbon-chat text-3xl"></span>
+    <!-- Core Features Section -->
+    <section id="features" class="w-full flex justify-center bg-gray-50/50 py-24">
+      <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-black text-gray-900 mb-4 text-gradient">核心优势</h2>
+          <p class="text-gray-500 max-w-2xl mx-auto">重塑人机交互体验，让每一个指令都能精准触达业务核心。</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div 
+            v-for="feature in features" 
+            :key="feature.title"
+            class="bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/50 transition-all group"
+          >
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <span :class="[feature.icon, 'text-2xl']"></span>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">自然语言交互</h3>
-            <p class="text-gray-500 leading-relaxed">告别复杂的 UI 路径，用最直觉的语言直接驱动后台功能。</p>
-          </div>
-          <div class="group">
-            <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-              <span class="i-carbon-activity text-3xl"></span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">意图驱动引擎</h3>
-            <p class="text-gray-500 leading-relaxed">智能解析用户真实意图，自动匹配最佳业务流程，响应快如闪电。</p>
-          </div>
-          <div class="group">
-            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
-              <span class="i-carbon-locked text-3xl"></span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">企业级私有化</h3>
-            <p class="text-gray-600 leading-relaxed">严格的数据权限控制与加密机制，确保每一句对话的私密与安全。</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-3">{{ feature.title }}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">
+              {{ feature.description }}
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- System Info & About Section -->
+    <section id="about" class="w-full flex justify-center py-24">
+      <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <div class="relative">
+            <div class="absolute -inset-4 bg-blue-100/50 rounded-3xl blur-2xl"></div>
+            <div class="relative bg-white border border-gray-100 rounded-3xl p-10 shadow-sm overflow-hidden">
+              <div class="flex items-center justify-between mb-8">
+                <h3 class="font-bold text-gray-900 text-xl">系统信息</h3>
+              </div>
+              
+              <div class="space-y-6">
+                <div class="flex justify-between items-center py-4 border-b border-gray-50">
+                  <span class="text-gray-500">当前版本</span>
+                  <span class="font-mono font-bold text-gray-900">{{ APP_VERSION }}</span>
+                </div>
+                <div class="flex justify-between items-center py-4 border-b border-gray-50">
+                  <span class="text-gray-500">开源许可</span>
+                  <span class="font-bold text-gray-900">MIT License</span>
+                </div>
+              </div>
+
+              <a 
+                :href="SOURCE_CODE_URL"
+                target="_blank"
+                class="w-full mt-10 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg shadow-gray-200"
+              >
+                <span class="i-carbon-logo-github text-2xl"></span>
+                <span>查看源代码</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -202,6 +251,12 @@ const authStore = useAuthStore()
 }
 
 .text-fill-transparent {
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 </style>

@@ -2,7 +2,6 @@
 export const PUBLIC_PATHS = new Set([
   '/',
   '/auth',
-  '/about',
 ])
 
 // 公开路径前缀（匹配 /docs/xxx）
