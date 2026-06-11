@@ -86,10 +86,6 @@ const features = [
                 <span class="text-sm text-gray-500">开源许可</span>
                 <span class="text-sm font-bold text-gray-900">MIT License</span>
               </div>
-              <div class="flex justify-between items-center py-3">
-                <span class="text-sm text-gray-500">最后更新</span>
-                <span class="text-sm font-bold text-gray-900">2026-05-22</span>
-              </div>
             </div>
 
             <a 

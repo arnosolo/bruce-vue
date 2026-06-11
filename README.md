@@ -63,8 +63,8 @@ npm run preview
 
 ### 源码
 
-- [Node.js 后端](https://github.com/arnosolo/ai-customer-service)
-- [Web 前端](https://github.com/arnosolo/ai-customer-service-vue)
+- [Node.js 后端](https://github.com/arnosolo/bruce-nodejs)
+- [Web 前端](https://github.com/arnosolo/bruce-vue)
 
 ### 参考文档
 

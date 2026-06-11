@@ -1,7 +1,7 @@
 export const APP_NAME = '聪明小黄'
 export const APP_FULL_NAME = '聪明小黄'
 export const APP_VERSION = '1.0.0'
-export const SOURCE_CODE_URL = 'https://github.com/arnosolo/ai-customer-service-vue'
+export const SOURCE_CODE_URL = 'https://github.com/arnosolo/bruce-vue'
 
 /** 触发会话标题自动总结的消息数量阈值 */
 export const TITLE_SUMMARIZATION_THRESHOLD = 4
