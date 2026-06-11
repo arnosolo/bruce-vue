@@ -1,6 +1,6 @@
 # 聪明小黄 Web 前端
 
-这是一个基于 Vue 3、TypeScript 和 Vite 构建的 AI 客户服务系统前端项目。
+AI 客服后端, 支持回复常见问题和修改用户资料.
 
 ## 技术栈
 
@@ -28,15 +28,6 @@ src/
 ├── App.vue       # 根组件
 └── main.ts       # 入口文件
 ```
-
-## 功能特性
-
-- 现代化的 Vue 3 Composition API 开发模式
-- 完整的 TypeScript 类型支持
-- 原子化 CSS 样式系统 (UnoCSS)
-- 模块化组件设计
-- 状态管理 (Pinia)
-- 路由守卫和权限控制
 
 ## 开发指南
 
@@ -71,10 +62,9 @@ npm run preview
 ## 资源
 
 ### 源码
-https://github.com/arnosolo/ai-customer-service-vue
 
-### 后端
-https://github.com/arnosolo/ai-customer-service
+- [Node.js 后端](https://github.com/arnosolo/ai-customer-service)
+- [Web 前端](https://github.com/arnosolo/ai-customer-service-vue)
 
 ### 参考文档
 
