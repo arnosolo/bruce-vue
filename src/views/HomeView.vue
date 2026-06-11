@@ -2,6 +2,7 @@
 import { APP_NAME } from '../constants'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { USER_ROLE_CONFIG } from '../types/userRole';
 
 const authStore = useAuthStore()
 </script>
@@ -101,7 +102,7 @@ const authStore = useAuthStore()
                   <div class="p-4 bg-blue-600 text-white flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="i-carbon-bot text-xl"></span>
-                      <span class="text-sm font-bold">AI 助手</span>
+                      <span class="text-sm font-bold">{{ USER_ROLE_CONFIG.AI.text }}</span>
                     </div>
                     <div class="flex gap-1">
                       <div class="w-2 h-2 rounded-full bg-white/40"></div>

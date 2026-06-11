@@ -29,7 +29,7 @@ export const USER_ROLE_CONFIG = {
     colorClass: 'bg-blue-50 text-blue-600'
   },
   [UserRole.AI]: { 
-    text: 'AI 助手', 
+    text: '小黄', 
     status: 'success', 
     icon: 'i-carbon-bot',
     colorClass: 'bg-emerald-50 text-emerald-600'

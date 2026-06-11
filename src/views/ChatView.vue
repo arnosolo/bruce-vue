@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { systemApi } from '../api/system'
 import { renderMarkdown } from '../utils/markdown'
+import { USER_ROLE_CONFIG } from '../types/userRole'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
@@ -188,7 +189,7 @@ const formatMessageTime = (dateStr: string) => {
           >
             <div class="flex items-center gap-2 mb-1 px-1">
               <span class="text-[11px] font-medium text-gray-500">
-                {{ msg.role === 'USER' ? (authStore.user?.name || '你') : 'AI 助手' }}
+                {{ msg.role === 'USER' ? (authStore.user?.name || '你') : USER_ROLE_CONFIG.AI.text }}
               </span>
               <span class="text-[10px] text-gray-400">
                 {{ formatMessageTime(msg.createdAt) }}
@@ -230,7 +231,9 @@ const formatMessageTime = (dateStr: string) => {
           </div>
           <div v-if="chatStore.isSending" class="flex flex-col items-start">
             <div class="flex items-center gap-2 mb-1 px-1">
-              <span class="text-[11px] font-medium text-gray-500">AI 助手</span>
+              <span class="text-[11px] font-medium text-gray-500">
+                {{ USER_ROLE_CONFIG.AI.text }}
+              </span>
               <span class="text-[10px] text-gray-400">正在输入...</span>
             </div>
             <div class="bg-white border border-gray-100 p-3 rounded-2xl shadow-sm flex items-center gap-1">
