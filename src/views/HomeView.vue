@@ -186,8 +186,8 @@ const features = [
     <!-- System Info & About Section -->
     <section id="about" class="w-full flex justify-center py-24">
       <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
-          <div class="relative">
+        <div class="flex lg:justify-center items-center gap-16">
+          <div class="relative flex-1 lg:max-w-xl">
             <div class="absolute -inset-4 bg-blue-100/50 rounded-3xl blur-2xl"></div>
             <div class="relative bg-white border border-gray-100 rounded-3xl p-10 shadow-sm overflow-hidden">
               <div class="flex items-center justify-between mb-8">
