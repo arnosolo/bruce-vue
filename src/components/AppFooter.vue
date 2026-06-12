@@ -94,12 +94,12 @@ onMounted(() => {
         </p>
         <div class="flex items-center gap-6">
           <span 
-            class="flex items-center gap-1.5 text-xs font-medium transition-colors"
-            :class="SYSTEM_STATUS_CONFIG[serverStatus].textClass"
-          >
-            <span 
-              class="w-1.5 h-1.5 rounded-full"
-              :class="SYSTEM_STATUS_CONFIG[serverStatus].dotClass"
+            class="flex items-center gap-1.5 text-xs font-medium"
+            :style="{ color: SYSTEM_STATUS_CONFIG[serverStatus]?.textColor }"
+          > 
+            <span
+              class="w-1.5 h-1.5 rounded-full transition-colors animate-pulse"
+              :style="{ backgroundColor: SYSTEM_STATUS_CONFIG[serverStatus]?.bgColor }"
             ></span>
             {{ SYSTEM_STATUS_CONFIG[serverStatus].text }}
           </span>

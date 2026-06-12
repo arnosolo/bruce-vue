@@ -204,8 +204,8 @@ const submitText = computed(() => {
         <!-- 服务器状态显示 -->
         <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-50 border border-gray-100 shadow-sm">
           <div 
-            class="w-2 h-2 rounded-full"
-            :class="SYSTEM_STATUS_CONFIG[serverStatus].dotClass"
+            class="w-2 h-2 rounded-full transition-colors animate-pulse"
+            :style="{ backgroundColor: SYSTEM_STATUS_CONFIG[serverStatus]?.bgColor }"
           ></div>
           <span class="text-[10px] font-medium uppercase tracking-wider text-gray-500">
             {{ SYSTEM_STATUS_CONFIG[serverStatus].text }}
