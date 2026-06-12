@@ -4,6 +4,10 @@ import type {
   LoginResponse, 
   RegisterParams, 
   RegisterResponse, 
+  VerifyEmailParams,
+  VerifyEmailResponse,
+  ResendCodeParams,
+  ResendCodeResponse,
   ProfileResponse, 
   UpdateProfileParams, 
   UpdateProfileResponse, 
@@ -28,6 +32,20 @@ export const authApi = {
    */
   register(data: RegisterParams): Promise<RegisterResponse> {
     return http.post('/auth/register', data)
+  },
+
+  /**
+   * 验证邮箱
+   */
+  verifyEmail(data: VerifyEmailParams): Promise<VerifyEmailResponse> {
+    return http.post('/auth/verify-email', data)
+  },
+
+  /**
+   * 重发验证码
+   */
+  resendCode(data: ResendCodeParams): Promise<ResendCodeResponse> {
+    return http.post('/auth/resend-code', data)
   },
 
   /**

@@ -30,8 +30,28 @@ export interface RegisterParams {
   name?: string
 }
 
-/** 注册响应 */
-export interface RegisterResponse extends BaseResponse<AuthData> {}
+/** 注册响应 - 注意：新版 API 注册后不直接返回 token，需验证邮箱 */
+export interface RegisterResponse extends BaseResponse<{ user: User }> {}
+
+/** 验证邮箱参数 */
+export interface VerifyEmailParams {
+  /** 电子邮箱 */
+  email: string
+  /** 6位验证码 */
+  code: string
+}
+
+/** 验证邮箱响应 */
+export interface VerifyEmailResponse extends BaseResponse<void> {}
+
+/** 重发验证码参数 */
+export interface ResendCodeParams {
+  /** 电子邮箱 */
+  email: string
+}
+
+/** 重发验证码响应 */
+export interface ResendCodeResponse extends BaseResponse<void> {}
 
 /** 获取个人资料响应 */
 export interface ProfileResponse extends BaseResponse<User> {}

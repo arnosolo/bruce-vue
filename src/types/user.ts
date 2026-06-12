@@ -14,6 +14,8 @@ export interface User {
   avatarKey?: string | null
   /** 头像的可访问 URL */
   avatarUrl?: string | null
+  /** 是否已验证邮箱 */
+  isEmailVerified: boolean
   /** 创建时间 */
   createdAt: string
   /** 更新时间 */
