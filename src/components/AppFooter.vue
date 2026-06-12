@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { APP_NAME, APP_VERSION, SOURCE_CODE_URL } from '../constants'
+import { APP_NAME, APP_VERSION, SOURCE_CODE_URL, ICP_FILING_NUMBER } from '../constants'
 import { RouterLink } from 'vue-router'
 import { systemApi } from '../api/system'
 import { SystemStatus, SYSTEM_STATUS_CONFIG } from '../types/system'
@@ -87,11 +87,15 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Bottom Bar -->
       <div class="pt-8 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p class="text-xs text-gray-400">
-          © {{ currentYear }} {{ APP_NAME }}. All rights reserved.
-        </p>
+        <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+          <p class="text-xs text-gray-400">
+            © {{ currentYear }} {{ APP_NAME }}. All rights reserved.
+          </p>
+          <span class="text-xs text-gray-400">
+            {{ ICP_FILING_NUMBER }}
+          </span>
+        </div>
         <div class="flex items-center gap-6">
           <span 
             class="flex items-center gap-1.5 text-xs font-medium"
