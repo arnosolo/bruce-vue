@@ -1,4 +1,4 @@
-name: Deploy Frontend to ECS
+name: Deploy Frontend to AliOSS
 on:
   push:
     branches: [ main ]
@@ -20,23 +20,24 @@ jobs:
           npm install
           npm run build
 
-      # 上传 dist 到 ECS 前端目录
-      - name: Upload dist to ECS
-        uses: easingthemes/ssh-deploy@main
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-          REMOTE_USER: ${{ secrets.SERVER_USER }}
-          SOURCE: dist/
-          TARGET: /usr/share/nginx/html/bruce-vue
-          # --delete：删除旧文件，保证线上和本地打包一致
-          ARGS: "-rltgoDzvO --delete"
+      - name: Install ossutil
+        run: |
+          wget https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64
+          chmod +x ossutil64
+          sudo mv ossutil64 /usr/local/bin/ossutil
 
-      # 重载 Nginx（不重启，无断流）
-      - name: Reload Nginx
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: nginx -t && systemctl reload nginx
+      - name: Upload dist to AliOSS
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+        run: |
+          OSS_ENDPOINT="oss-cn-hangzhou.aliyuncs.com"
+          OSS_BUCKET="ai-cs-web"
+
+          ossutil config set \
+            --endpoint $OSS_ENDPOINT \
+            --access-key-id $OSS_ACCESS_KEY_ID \
+            --access-key-secret $OSS_ACCESS_KEY_SECRET
+
+          ossutil rm oss://$OSS_BUCKET/$OSS_PREFIX/ -rf
+          ossutil cp dist/ oss://$OSS_BUCKET/ -r
