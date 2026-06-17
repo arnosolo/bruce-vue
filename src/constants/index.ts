@@ -1,6 +1,6 @@
 export const APP_NAME = '聪明小黄'
 export const APP_FULL_NAME = '聪明小黄'
-export const APP_VERSION = '1.0.0'
+export const APP_VERSION = '1.0.1'
 export const SOURCE_CODE_URL = 'https://github.com/arnosolo/bruce-vue'
 export const ICP_FILING_NUMBER = '浙ICP备2026041596号-1'
 
