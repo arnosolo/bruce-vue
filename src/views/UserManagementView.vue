@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { userApi } from '../api/user'
-import { UserRole, USER_ROLE_CONFIG, getUserRoleConfig } from '../types/userRole'
+import { useI18n } from '../i18n'
+import { UserRole, USER_ROLE_CONFIG, getUserRoleConfig, getUserRoleLabel } from '../types/userRole'
 import type { User } from '../types/user'
 import type { Pagination as PaginationType } from '../types/api'
 import Pagination from '../components/Pagination.vue'
 
+const { locale, t } = useI18n()
 const users = ref<User[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -41,7 +43,7 @@ async function fetchUsers(page = pagination.value.page) {
       error.value = res.message
     }
   } catch (err: any) {
-    error.value = err.message || '获取用户列表失败'
+    error.value = err.message || t('users.fetchListFailed')
   } finally {
     loading.value = false
   }
@@ -74,14 +76,14 @@ async function handleRoleUpdate() {
       alert(res.message)
     }
   } catch (err: any) {
-    alert(err.message || '更新角色失败')
+    alert(err.message || t('users.updateRoleFailed'))
   } finally {
     isSubmitting.value = false
   }
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleString('zh-CN', {
+  return new Date(dateStr).toLocaleString(locale.value, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -98,8 +100,8 @@ onMounted(() => fetchUsers(1))
     <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">用户管理</h1>
-        <p class="mt-1 text-sm text-gray-500">查看用户列表并管理用户权限角色</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('users.title') }}</h1>
+        <p class="mt-1 text-sm text-gray-500">{{ t('users.subtitle') }}</p>
       </div>
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <!-- Search Bar -->
@@ -108,7 +110,7 @@ onMounted(() => fetchUsers(1))
           <input 
             v-model="searchQuery"
             type="text" 
-            placeholder="搜索用户名或邮箱..." 
+            :placeholder="t('users.searchPlaceholder')" 
             class="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
             @keyup.enter="fetchUsers(1)"
           />
@@ -119,7 +121,7 @@ onMounted(() => fetchUsers(1))
           class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold flex items-center justify-center gap-2 shadow-sm disabled:bg-blue-300"
         >
           <span v-if="loading" class="i-carbon-progress-bar-round animate-spin"></span>
-          搜索
+          {{ t('common.search') }}
         </button>
       </div>
     </div>
@@ -130,7 +132,7 @@ onMounted(() => fetchUsers(1))
       <div v-if="loading && users.length === 0" class="flex justify-center py-24">
         <div class="flex flex-col items-center">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
-          <p class="text-gray-500 text-sm px-4 text-center">加载用户列表中...</p>
+          <p class="text-gray-500 text-sm px-4 text-center">{{ t('users.loading') }}</p>
         </div>
       </div>
 
@@ -139,13 +141,13 @@ onMounted(() => fetchUsers(1))
         <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-red-600 mb-4">
           <span class="i-carbon-error text-2xl"></span>
         </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">获取数据失败</h3>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">{{ t('users.fetchFailed') }}</h3>
         <p class="text-gray-500 text-sm mb-6 px-4">{{ error }}</p>
         <button 
           @click="fetchUsers()" 
           class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-bold"
         >
-          重试
+          {{ t('common.retry') }}
         </button>
       </div>
 
@@ -156,11 +158,11 @@ onMounted(() => fetchUsers(1))
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-gray-50 border-b border-gray-200">
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[30%]">用户</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">邮箱</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[120px]">角色</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[180px]">加入时间</th>
-                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right w-[120px]">操作</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[30%]">{{ t('users.user') }}</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{{ t('users.email') }}</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[120px]">{{ t('users.role') }}</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-[180px]">{{ t('users.joinedAt') }}</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right w-[120px]">{{ t('users.actions') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -174,7 +176,7 @@ onMounted(() => fetchUsers(1))
                       </span>
                     </div>
                     <div>
-                      <div class="text-sm font-bold text-gray-900">{{ user.name || '未设置姓名' }}</div>
+                      <div class="text-sm font-bold text-gray-900">{{ user.name || t('common.noName') }}</div>
                       <div class="text-xs text-gray-400">ID: {{ user.id }}</div>
                     </div>
                   </div>
@@ -189,10 +191,10 @@ onMounted(() => fetchUsers(1))
                       ]"
                     >
                       <span :class="getUserRoleConfig(user.role)?.icon"></span>
-                      {{ getUserRoleConfig(user.role)?.text }}
+                      {{ getUserRoleLabel(user.role) }}
                     </span>
                   </template>
-                  <span v-else class="text-xs text-gray-400 italic">未知角色 ({{ user.role }})</span>
+                  <span v-else class="text-xs text-gray-400 italic">{{ t('common.unknownRole', { role: user.role }) }}</span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                   {{ formatDate(user.createdAt) }}
@@ -203,7 +205,7 @@ onMounted(() => fetchUsers(1))
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     <span class="i-carbon-user-role text-lg"></span>
-                    修改角色
+                    {{ t('users.changeRole') }}
                   </button>
                 </td>
               </tr>
@@ -223,7 +225,7 @@ onMounted(() => fetchUsers(1))
                   </span>
                 </div>
                 <div>
-                  <div class="text-sm font-bold text-gray-900">{{ user.name || '未设置姓名' }}</div>
+                  <div class="text-sm font-bold text-gray-900">{{ user.name || t('common.noName') }}</div>
                   <div class="text-xs text-gray-400">ID: {{ user.id }}</div>
                 </div>
               </div>
@@ -235,18 +237,18 @@ onMounted(() => fetchUsers(1))
                   ]"
                 >
                   <span :class="getUserRoleConfig(user.role)?.icon"></span>
-                  {{ getUserRoleConfig(user.role)?.text }}
+                  {{ getUserRoleLabel(user.role) }}
                 </span>
               </template>
             </div>
             
             <div class="grid grid-cols-1 gap-1 text-sm">
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">邮箱</span>
+                <span class="text-gray-400">{{ t('users.email') }}</span>
                 <span class="text-gray-600">{{ user.email }}</span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">加入时间</span>
+                <span class="text-gray-400">{{ t('users.joinedAt') }}</span>
                 <span class="text-gray-500">{{ formatDate(user.createdAt) }}</span>
               </div>
             </div>
@@ -257,7 +259,7 @@ onMounted(() => fetchUsers(1))
                 class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
                 <span class="i-carbon-user-role text-lg"></span>
-                修改用户角色
+                {{ t('users.changeUserRole') }}
               </button>
             </div>
           </div>
@@ -267,8 +269,8 @@ onMounted(() => fetchUsers(1))
         <div v-if="users.length === 0" class="px-6 py-24 text-center text-gray-500">
           <div class="flex flex-col items-center">
             <span class="i-carbon-user-avatar text-5xl mb-4 opacity-10"></span>
-            <p class="text-lg font-medium text-gray-400 px-6">{{ searchQuery ? '未找到匹配的用户' : '暂无用户数据' }}</p>
-            <p class="text-sm text-gray-400 mt-1 px-6">尝试调整搜索关键词或重置筛选条件</p>
+            <p class="text-lg font-medium text-gray-400 px-6">{{ searchQuery ? t('users.emptySearch') : t('users.empty') }}</p>
+            <p class="text-sm text-gray-400 mt-1 px-6">{{ t('users.emptyHint') }}</p>
           </div>
         </div>
 
@@ -291,7 +293,7 @@ onMounted(() => fetchUsers(1))
         <div class="absolute inset-0 bg-black/50" @click="showRoleModal = false"></div>
         <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
           <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-900">修改用户角色</h2>
+            <h2 class="text-xl font-bold text-gray-900">{{ t('users.roleModalTitle') }}</h2>
             <button @click="showRoleModal = false" class="text-gray-400 hover:text-gray-600">
               <span class="i-carbon-close text-2xl"></span>
             </button>
@@ -304,13 +306,13 @@ onMounted(() => fetchUsers(1))
                 <span v-else>{{ (currentUser?.name || currentUser?.email || 'U').charAt(0).toUpperCase() }}</span>
               </div>
               <div>
-                <div class="text-sm font-bold text-gray-900">{{ currentUser?.name || '未设置姓名' }}</div>
+                <div class="text-sm font-bold text-gray-900">{{ currentUser?.name || t('common.noName') }}</div>
                 <div class="text-xs text-gray-600">{{ currentUser?.email }}</div>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-3">选择新角色</label>
+              <label class="block text-sm font-medium text-gray-700 mb-3">{{ t('users.selectRole') }}</label>
               <div class="grid grid-cols-2 gap-3">
                 <button 
                   v-for="(config, role) in USER_ROLE_CONFIG"
@@ -324,7 +326,7 @@ onMounted(() => fetchUsers(1))
                   ]"
                 >
                   <span :class="[config.icon, 'text-2xl mb-1']"></span>
-                  <span class="text-sm font-bold">{{ config.text }}</span>
+                  <span class="text-sm font-bold">{{ getUserRoleLabel(role) }}</span>
                   <span class="text-[10px] opacity-60 uppercase">{{ role }}</span>
                 </button>
               </div>
@@ -336,7 +338,7 @@ onMounted(() => fetchUsers(1))
               @click="showRoleModal = false"
               class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
             >
-              取消
+              {{ t('common.cancel') }}
             </button>
             <button 
               @click="handleRoleUpdate"
@@ -344,7 +346,7 @@ onMounted(() => fetchUsers(1))
               class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm font-bold flex items-center gap-2"
             >
               <span v-if="isSubmitting" class="i-carbon-progress-bar-round animate-spin"></span>
-              <span>确认修改</span>
+              <span>{{ t('users.confirmChange') }}</span>
             </button>
           </div>
         </div>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from '../i18n'
+
 /**
  * 通用分页组件
  */
@@ -16,6 +18,7 @@ interface Emits {
 const props = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
 
 function handlePageChange(newPage: number) {
   if (
@@ -64,8 +67,7 @@ const getVisiblePages = () => {
   <div v-if="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
     <!-- Total info -->
     <div class="text-sm text-gray-500">
-      共 <span class="font-medium text-gray-900">{{ total }}</span> 条记录，
-      第 <span class="font-medium text-gray-900">{{ page }}</span> / {{ totalPages }} 页
+      {{ t('pagination.summary', { total, page, totalPages }) }}
     </div>
 
     <!-- Page navigation -->
@@ -75,7 +77,7 @@ const getVisiblePages = () => {
         @click="handlePageChange(page - 1)"
         :disabled="page === 1 || loading"
         class="p-2 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:border-blue-200"
-        title="上一页"
+        :title="t('pagination.prev')"
       >
         <span class="i-carbon-chevron-left text-lg block"></span>
       </button>
@@ -110,7 +112,7 @@ const getVisiblePages = () => {
         @click="handlePageChange(page + 1)"
         :disabled="page === totalPages || loading"
         class="p-2 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:border-blue-200"
-        title="下一页"
+        :title="t('pagination.next')"
       >
         <span class="i-carbon-chevron-right text-lg block"></span>
       </button>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, watch } from 'vue'
 import { faqApi } from '../api/faq'
+import { useI18n } from '../i18n'
 import type { Faq, CreateFaqRequest } from '../types/faq'
 import type { Pagination as PaginationType } from '../types/api'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import Pagination from '../components/Pagination.vue'
 
+const { t } = useI18n()
 const faqs = ref<Faq[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -46,7 +48,7 @@ async function fetchFaqs(page = pagination.value.page) {
       error.value = res.message
     }
   } catch (err: any) {
-    error.value = err.message || '获取列表失败'
+    error.value = err.message || t('faq.fetchListFailed')
   } finally {
     loading.value = false
   }
@@ -96,14 +98,14 @@ async function handleDelete() {
       alert(res.message)
     }
   } catch (err: any) {
-    alert(err.message || '删除失败')
+    alert(err.message || t('faq.deleteFailed'))
   } finally {
     isSubmitting.value = false
   }
 }
 
 async function handleRebuildVectors() {
-  if (!confirm('确定要重新生成所有 FAQ 的向量吗？这可能需要一些时间。')) return
+  if (!confirm(t('faq.confirmRebuild'))) return
   
   isRebuilding.value = true
   try {
@@ -111,12 +113,12 @@ async function handleRebuildVectors() {
       force: true,
     })
     if (res.success) {
-      alert(res.message || '向量重构任务已启动')
+      alert(res.message || t('faq.rebuildStarted'))
     } else {
-      alert(res.message || '操作失败')
+      alert(res.message || t('faq.operationFailed'))
     }
   } catch (err: any) {
-    alert(err.message || '请求失败')
+    alert(err.message || t('faq.requestFailed'))
   } finally {
     isRebuilding.value = false
   }
@@ -140,7 +142,7 @@ async function handleSubmit() {
       alert(res.message)
     }
   } catch (err: any) {
-    alert(err.message || '提交失败')
+    alert(err.message || t('faq.submitFailed'))
   } finally {
     isSubmitting.value = false
   }
@@ -154,8 +156,8 @@ onMounted(() => fetchFaqs(1))
     <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">常见问题管理</h1>
-        <p class="mt-1 text-sm text-gray-500">管理展示在客户端的常见问题与解答</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('faq.title') }}</h1>
+        <p class="mt-1 text-sm text-gray-500">{{ t('faq.subtitle') }}</p>
       </div>
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <!-- Search Bar -->
@@ -164,7 +166,7 @@ onMounted(() => fetchFaqs(1))
           <input 
             v-model="searchQuery"
             type="text" 
-            placeholder="搜索问题或答案..." 
+            :placeholder="t('faq.searchPlaceholder')" 
             class="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
             @keyup.enter="fetchFaqs(1)"
           />
@@ -176,24 +178,24 @@ onMounted(() => fetchFaqs(1))
             class="flex-1 sm:flex-none px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <span v-if="loading" class="i-carbon-progress-bar-round animate-spin"></span>
-            搜索
+            {{ t('common.search') }}
           </button>
           <button 
             @click="handleRebuildVectors"
             :disabled="isRebuilding"
             class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors whitespace-nowrap text-sm font-bold disabled:opacity-50"
-            title="重新生成所有 FAQ 的向量，用于向量搜索"
+            :title="t('faq.rebuildTitle')"
           >
             <span v-if="isRebuilding" class="i-carbon-progress-bar-round animate-spin"></span>
             <span v-else class="i-carbon-renew text-xl"></span>
-            <span>重构向量</span>
+            <span>{{ t('faq.rebuildVectors') }}</span>
           </button>
           <button 
             @click="openAddModal"
             class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap text-sm font-bold"
           >
             <span class="i-carbon-add text-xl"></span>
-            <span>添加问题</span>
+            <span>{{ t('faq.addQuestion') }}</span>
           </button>
         </div>
       </div>
@@ -205,7 +207,7 @@ onMounted(() => fetchFaqs(1))
       <div v-if="loading && faqs.length === 0" class="flex justify-center py-24">
         <div class="flex flex-col items-center">
           <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
-          <p class="text-gray-500 text-sm px-4 text-center">加载常见问题中...</p>
+          <p class="text-gray-500 text-sm px-4 text-center">{{ t('faq.loading') }}</p>
         </div>
       </div>
 
@@ -214,13 +216,13 @@ onMounted(() => fetchFaqs(1))
         <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-red-600 mb-4">
           <span class="i-carbon-error text-2xl"></span>
         </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">获取数据失败</h3>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">{{ t('faq.fetchFailed') }}</h3>
         <p class="text-gray-500 text-sm mb-6 px-4">{{ error }}</p>
         <button 
           @click="fetchFaqs()" 
           class="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-bold"
         >
-          重试
+          {{ t('common.retry') }}
         </button>
       </div>
 
@@ -228,10 +230,10 @@ onMounted(() => fetchFaqs(1))
       <div v-else-if="faqs.length === 0" class="px-6 py-24 text-center text-gray-500">
         <div class="flex flex-col items-center">
           <span class="i-carbon-help text-5xl mb-4 opacity-10"></span>
-          <p class="text-lg font-medium text-gray-400 px-6">{{ searchQuery ? '未找到匹配的问题' : '暂无常见问题数据' }}</p>
-          <p class="text-sm text-gray-400 mt-1 px-6">尝试调整搜索关键词或立即添加新问题</p>
+          <p class="text-lg font-medium text-gray-400 px-6">{{ searchQuery ? t('faq.emptySearch') : t('faq.empty') }}</p>
+          <p class="text-sm text-gray-400 mt-1 px-6">{{ t('faq.emptyHint') }}</p>
           <button v-if="!searchQuery" @click="openAddModal" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-bold">
-            立即添加
+            {{ t('faq.addNow') }}
           </button>
         </div>
       </div>
@@ -250,7 +252,7 @@ onMounted(() => fetchFaqs(1))
                   <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
                     ID: {{ faq.id }}
                   </span>
-                  <span v-if="faq.embeddingModel" class="bg-gray-50 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-100 font-medium" :title="'向量化模型: ' + faq.embeddingModel">
+                  <span v-if="faq.embeddingModel" class="bg-gray-50 text-gray-400 text-[10px] px-2 py-0.5 rounded border border-gray-100 font-medium" :title="t('faq.vectorModel', { model: faq.embeddingModel })">
                     {{ faq.embeddingModel }}
                   </span>
                 </div>
@@ -266,14 +268,14 @@ onMounted(() => fetchFaqs(1))
                   class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <span class="i-carbon-edit text-lg"></span>
-                  <span class="sm:hidden lg:inline">编辑</span>
+                  <span class="sm:hidden lg:inline">{{ t('common.edit') }}</span>
                 </button>
                 <button 
                   @click="confirmDelete(faq)"
                   class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <span class="i-carbon-trash-can text-lg"></span>
-                  <span class="sm:hidden lg:inline">删除</span>
+                  <span class="sm:hidden lg:inline">{{ t('common.delete') }}</span>
                 </button>
               </div>
             </div>
@@ -300,7 +302,7 @@ onMounted(() => fetchFaqs(1))
         <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh]">
           <div class="p-6 border-b border-gray-100 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-900">
-              {{ currentFaq ? '编辑常见问题' : '添加常见问题' }}
+              {{ currentFaq ? t('faq.editTitle') : t('faq.addTitle') }}
             </h2>
             <button @click="showFormModal = false" class="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-full transition-colors">
               <span class="i-carbon-close text-2xl"></span>
@@ -309,22 +311,22 @@ onMounted(() => fetchFaqs(1))
           
           <div class="p-6 overflow-y-auto space-y-6">
             <div class="space-y-1.5">
-              <label class="block text-sm font-bold text-gray-700">问题标题</label>
+              <label class="block text-sm font-bold text-gray-700">{{ t('faq.questionLabel') }}</label>
               <input 
                 v-model="formData.question"
                 type="text"
                 class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-500 outline-none transition-all text-sm"
-                placeholder="例如：如何找回密码？"
+                :placeholder="t('faq.questionPlaceholder')"
               />
             </div>
             
             <div class="space-y-1.5">
-              <label class="block text-sm font-bold text-gray-700">解答内容</label>
+              <label class="block text-sm font-bold text-gray-700">{{ t('faq.answerLabel') }}</label>
               <textarea 
                 v-model="formData.answer"
                 rows="8"
                 class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-500 outline-none transition-all resize-none text-sm leading-relaxed"
-                placeholder="请输入详细的解答内容，支持换行..."
+                :placeholder="t('faq.answerPlaceholder')"
               ></textarea>
             </div>
           </div>
@@ -334,7 +336,7 @@ onMounted(() => fetchFaqs(1))
               @click="showFormModal = false"
               class="px-5 py-2 text-gray-600 hover:bg-white border border-transparent hover:border-gray-200 rounded-lg transition-colors font-bold text-sm"
             >
-              取消
+              {{ t('common.cancel') }}
             </button>
             <button 
               @click="handleSubmit"
@@ -342,7 +344,7 @@ onMounted(() => fetchFaqs(1))
               class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm font-bold text-sm flex items-center gap-2"
             >
               <span v-if="isSubmitting" class="i-carbon-progress-bar-round animate-spin"></span>
-              <span>{{ currentFaq ? '保存修改' : '立即创建' }}</span>
+              <span>{{ currentFaq ? t('common.save') : t('faq.createNow') }}</span>
             </button>
           </div>
         </div>
@@ -351,9 +353,9 @@ onMounted(() => fetchFaqs(1))
 
     <ConfirmModal
       :show="showDeleteConfirm"
-      title="确认删除"
-      :message="`您确定要删除问题 '${currentFaq?.question}' 吗？此操作不可撤销。`"
-      confirm-text="删除"
+      :title="t('faq.deleteTitle')"
+      :message="t('faq.deleteMessage', { question: currentFaq?.question || '' })"
+      :confirm-text="t('common.delete')"
       @confirm="handleDelete"
       @cancel="showDeleteConfirm = false"
     />

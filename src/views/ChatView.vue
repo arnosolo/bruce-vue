@@ -4,12 +4,14 @@ import { useChatStore } from '../stores/chat'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { systemApi } from '../api/system'
+import { useI18n } from '../i18n'
 import { renderMarkdown } from '../utils/markdown'
-import { USER_ROLE_CONFIG } from '../types/userRole'
+import { UserRole, getUserRoleLabel } from '../types/userRole'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const newMessage = ref('')
 const messageContainer = ref<HTMLElement | null>(null)
@@ -55,7 +57,7 @@ const onFileChange = async (e: Event) => {
 
   // 限制文件大小，例如 5MB
   if (file.size > 5 * 1024 * 1024) {
-    alert('图片大小不能超过 5MB')
+    alert(t('chat.imageTooLarge'))
     return
   }
 
@@ -65,14 +67,14 @@ const onFileChange = async (e: Event) => {
     const res = await systemApi.uploadChatFile(file)
     if (!res.success || !res.data) {
 
-      throw new Error(res.message || '上传失败')
+      throw new Error(res.message || t('chat.uploadFailed'))
     }
 
     // 发送图片消息
     await chatStore.sendMessage('', 'IMAGE', res.data.key)
   } catch (error) {
     console.error('Image upload failed:', error)
-    alert(error instanceof Error ? error.message : '图片上传失败')
+    alert(error instanceof Error ? error.message : t('chat.imageUploadFailed'))
   } finally {
     isUploading.value = false
     if (fileInput.value) fileInput.value.value = ''
@@ -80,7 +82,7 @@ const onFileChange = async (e: Event) => {
 }
 
 const handleNewChat = async () => {
-  await chatStore.createConversation('新会话')
+  await chatStore.createConversation(t('chat.newConversation'))
   if (window.innerWidth < 768) isSidebarOpen.value = false
 }
 
@@ -127,7 +129,7 @@ const formatMessageTime = (dateStr: string) => {
       ]"
     >
       <div class="p-4 border-b flex items-center justify-between">
-        <h2 class="font-bold text-gray-700">对话记录</h2>
+        <h2 class="font-bold text-gray-700">{{ t('chat.history') }}</h2>
         <button @click="toggleSidebar" class="md:hidden p-2 text-gray-500">
           <span class="i-carbon-close text-xl"></span>
         </button>
@@ -138,7 +140,7 @@ const formatMessageTime = (dateStr: string) => {
           class="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-sm"
         >
           <span class="i-carbon-add"></span>
-          开启新对话
+          {{ t('chat.newChat') }}
         </button>
       </div>
       <div class="flex-1 overflow-y-auto">
@@ -151,7 +153,7 @@ const formatMessageTime = (dateStr: string) => {
             chatStore.currentConversationId === conv.id ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
           ]"
         >
-          <div class="font-medium truncate text-sm">{{ conv.title || '无标题会话' }}</div>
+          <div class="font-medium truncate text-sm">{{ conv.title || t('chat.untitled') }}</div>
           <div class="text-[10px] text-gray-400 mt-1">{{ formatMessageTime(conv.createdAt) }}</div>
         </div>
       </div>
@@ -172,7 +174,7 @@ const formatMessageTime = (dateStr: string) => {
           <span class="i-carbon-menu text-xl"></span>
         </button>
         <div class="flex-1 font-bold truncate text-sm">
-          {{ chatStore.conversations.find(c => c.id === chatStore.currentConversationId)?.title || '聊天' }}
+          {{ chatStore.conversations.find(c => c.id === chatStore.currentConversationId)?.title || t('chat.title') }}
         </div>
       </div>
 
@@ -189,7 +191,7 @@ const formatMessageTime = (dateStr: string) => {
           >
             <div class="flex items-center gap-2 mb-1 px-1">
               <span class="text-[11px] font-medium text-gray-500">
-                {{ msg.role === 'USER' ? (authStore.user?.name || '你') : USER_ROLE_CONFIG.AI.text }}
+                {{ msg.role === 'USER' ? (authStore.user?.name || t('chat.you')) : getUserRoleLabel(UserRole.AI) }}
               </span>
               <span class="text-[10px] text-gray-400">
                 {{ formatMessageTime(msg.createdAt) }}
@@ -224,7 +226,7 @@ const formatMessageTime = (dateStr: string) => {
                   class="flex items-center gap-1.5 text-[11px] font-medium text-red-500 hover:text-red-600 transition-colors py-1"
                 >
                   <span class="i-carbon-renew text-sm"></span>
-                  <span>发送失败，点击重试</span>
+                  <span>{{ t('chat.retryFailed') }}</span>
                 </button>
               </div>
             </div>
@@ -232,9 +234,9 @@ const formatMessageTime = (dateStr: string) => {
           <div v-if="chatStore.isSending" class="flex flex-col items-start">
             <div class="flex items-center gap-2 mb-1 px-1">
               <span class="text-[11px] font-medium text-gray-500">
-                {{ USER_ROLE_CONFIG.AI.text }}
+                {{ getUserRoleLabel(UserRole.AI) }}
               </span>
-              <span class="text-[10px] text-gray-400">正在输入...</span>
+              <span class="text-[10px] text-gray-400">{{ t('chat.typing') }}</span>
             </div>
             <div class="bg-white border border-gray-100 p-3 rounded-2xl shadow-sm flex items-center gap-1">
               <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
@@ -258,7 +260,7 @@ const formatMessageTime = (dateStr: string) => {
               @click="handleImageUpload"
               :disabled="chatStore.isSending || isUploading"
               class="w-12 h-12 flex-shrink-0 bg-gray-100 text-gray-500 rounded-2xl hover:bg-gray-200 transition-all flex items-center justify-center disabled:opacity-50"
-              title="发送图片"
+              :title="t('chat.imageTitle')"
             >
               <span v-if="isUploading" class="i-carbon-progress-bar-round animate-spin text-xl"></span>
               <span v-else class="i-carbon-image text-xl"></span>
@@ -266,7 +268,7 @@ const formatMessageTime = (dateStr: string) => {
             <textarea
               v-model="newMessage"
               @keydown.enter.prevent="handleSendMessage"
-              placeholder="有任何问题尽管问我..."
+              :placeholder="t('chat.placeholder')"
               class="flex-1 p-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all text-sm md:text-base bg-gray-50 focus:bg-white"
               rows="1"
               style="min-height: 48px; max-height: 120px;"
@@ -280,7 +282,7 @@ const formatMessageTime = (dateStr: string) => {
             </button>
           </div>
           <div class="hidden md:block text-[10px] text-gray-400 mt-2 text-center">
-            按 Enter 发送，Shift + Enter 换行
+            {{ t('chat.shortcut') }}
           </div>
         </div>
       </template>
@@ -289,10 +291,10 @@ const formatMessageTime = (dateStr: string) => {
           <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
             <span class="i-carbon-chat text-4xl text-blue-500"></span>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">欢迎来到智能对话</h3>
-          <p class="text-sm max-w-xs">选择一个历史会话，或点击下方按钮开始新的探索。</p>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">{{ t('chat.welcomeTitle') }}</h3>
+          <p class="text-sm max-w-xs">{{ t('chat.welcomeDescription') }}</p>
           <button @click="handleNewChat" class="mt-6 md:hidden px-6 py-3 bg-blue-600 text-white rounded-xl">
-            开始新对话
+            {{ t('chat.startNew') }}
           </button>
         </div>
       </template>

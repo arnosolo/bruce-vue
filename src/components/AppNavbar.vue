@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import { APP_NAME } from '../constants'
+import { useI18n } from '../i18n'
 import { useAuthStore } from '../stores/auth'
 import { UserRole } from '../types/userRole'
 import ConfirmModal from './ConfirmModal.vue'
@@ -9,21 +9,22 @@ import app_icon from "../assets/app-icon-256.jpg";
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { t, languageName, toggleLocale } = useI18n()
 
 const navItems = computed(() => {
   const items = [
-    { name: '首页', path: '/' },
-    { name: '聊天', path: '/chat' }
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.chat'), path: '/chat' }
   ]
   
   const role = authStore.user?.role
   
   if (role === UserRole.Admin || role === UserRole.Agent) {
-    items.push({ name: '问题管理', path: '/faq-management' })
+    items.push({ name: t('nav.faqManagement'), path: '/faq-management' })
   }
   
   if (role === UserRole.Admin) {
-    items.push({ name: '用户管理', path: '/user-management' })
+    items.push({ name: t('nav.userManagement'), path: '/user-management' })
   }
   
   return items
@@ -54,7 +55,7 @@ function toggleMobileMenu() {
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2 no-underline group" exact-active-class="none">
         <img :src="app_icon" alt="App icon" class="w-8 h-8 rounded-lg transition-transform group-hover:scale-105">
-        <span class="font-bold text-gray-900 text-lg tracking-tight">{{ APP_NAME }}</span>
+        <span class="font-bold text-gray-900 text-lg tracking-tight">{{ t('app.name') }}</span>
       </RouterLink>
       
       <!-- Desktop Nav Items -->
@@ -78,6 +79,14 @@ function toggleMobileMenu() {
       
       <!-- Desktop User Actions -->
       <div class="hidden md:flex items-center gap-4">
+        <button 
+          @click="toggleLocale"
+          class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-lg"
+          :title="t('language.label')"
+        >
+          <span class="i-carbon-language text-lg"></span>
+          <span>{{ languageName }}</span>
+        </button>
         <template v-if="authStore.isAuthenticated">
           <RouterLink to="/profile" class="flex items-center gap-3 pr-4 border-r border-gray-200 no-underline hover:opacity-80 transition-opacity">
             <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -94,7 +103,7 @@ function toggleMobileMenu() {
             @click="handleLogout"
             class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"
           >
-            退出
+            {{ t('nav.logout') }}
           </button>
         </template>
         <RouterLink 
@@ -102,12 +111,19 @@ function toggleMobileMenu() {
           to="/auth" 
           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors rounded-lg shadow-sm"
         >
-          登录
+          {{ t('nav.login') }}
         </RouterLink>
       </div>
 
       <!-- Mobile Menu Button -->
       <div class="flex md:hidden items-center gap-2">
+        <button
+          @click="toggleLocale"
+          class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          :title="t('language.label')"
+        >
+          <span class="i-carbon-language text-xl"></span>
+        </button>
         <button 
           v-if="authStore.isAuthenticated"
           @click="toggleMobileMenu" 
@@ -120,7 +136,7 @@ function toggleMobileMenu() {
           to="/auth" 
           class="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg"
         >
-          登录
+          {{ t('nav.login') }}
         </RouterLink>
       </div>
     </nav>
@@ -161,7 +177,7 @@ function toggleMobileMenu() {
             </template>
           </div>
           <div>
-            <div class="text-sm font-bold text-gray-900">{{ authStore.user?.name || '用户' }}</div>
+            <div class="text-sm font-bold text-gray-900">{{ authStore.user?.name || t('common.userFallback') }}</div>
             <div class="text-xs text-gray-500">{{ authStore.user?.email }}</div>
           </div>
         </RouterLink>
@@ -170,7 +186,7 @@ function toggleMobileMenu() {
           class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 text-left font-medium"
         >
           <span class="i-carbon-logout text-xl"></span>
-          退出登录
+          {{ t('nav.logoutFull') }}
         </button>
       </div>
     </div>
@@ -178,8 +194,8 @@ function toggleMobileMenu() {
 
   <ConfirmModal
     :show="showLogoutConfirm"
-    title="退出登录"
-    message="您确定要退出当前账号吗？"
+    :title="t('nav.logoutTitle')"
+    :message="t('nav.logoutMessage')"
     @confirm="confirmLogout"
     @cancel="showLogoutConfirm = false"
   />

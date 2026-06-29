@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from '../i18n'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api/auth'
 import { systemApi } from '../api/system'
@@ -10,6 +11,7 @@ import type { User } from '../types/user'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { locale, t } = useI18n()
 const loading = ref(true)
 const profile = ref<User | null>(null)
 const error = ref('')
@@ -65,7 +67,7 @@ async function fetchProfile() {
       authStore.setUser(response.data)
     }
   } catch (err: any) {
-    error.value = err.message || '获取个人资料失败'
+    error.value = err.message || t('profile.fetchFailed')
   } finally {
     loading.value = false
   }
@@ -99,18 +101,18 @@ function cancelChangePassword() {
 
 async function handlePasswordSave() {
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    passwordError.value = '两次输入的密码不一致'
+    passwordError.value = t('profile.passwordMismatch')
     return
   }
   
   if (passwordForm.newPassword.length < 8) {
-    passwordError.value = '新密码长度至少为8位'
+    passwordError.value = t('profile.passwordTooShort')
     return
   }
   
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
   if (!passwordRegex.test(passwordForm.newPassword)) {
-    passwordError.value = '新密码需包含大写字母、小写字母和数字'
+    passwordError.value = t('profile.passwordWeak')
     return
   }
 
@@ -123,14 +125,14 @@ async function handlePasswordSave() {
       newPassword: passwordForm.newPassword
     })
     if (response.success) {
-      passwordSuccess.value = '密码修改成功'
+      passwordSuccess.value = t('profile.passwordSuccess')
       setTimeout(() => {
         isChangingPassword.value = false
         passwordSuccess.value = ''
       }, 2000)
     }
   } catch (err: any) {
-    passwordError.value = err.message || '修改密码失败，请检查旧密码是否正确'
+    passwordError.value = err.message || t('profile.passwordFailed')
   } finally {
     passwordSaving.value = false
   }
@@ -149,7 +151,7 @@ async function handleSave() {
       isEditing.value = false
     }
   } catch (err: any) {
-    error.value = err.message || '保存失败，请稍后再试'
+    error.value = err.message || t('profile.saveFailed')
   } finally {
     saving.value = false
   }
@@ -167,7 +169,7 @@ async function handleAvatarChange(e: Event) {
   // 限制文件类型
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
   if (!allowedTypes.includes(file.type)) {
-    error.value = '仅支持 JPG/PNG 格式的图片'
+    error.value = t('profile.avatarTypeError')
     if (fileInput.value) fileInput.value.value = ''
     return
   }
@@ -185,7 +187,7 @@ async function handleAvatarChange(e: Event) {
     // 2. 上传到 OSS
     const uploadRes = await systemApi.uploadAvatar(compressedFile)
     if (!uploadRes.success || !uploadRes.data) {
-      throw new Error(uploadRes.message || '头像上传失败')
+      throw new Error(uploadRes.message || t('profile.avatarUploadFailed'))
     }
 
     // 3. 更新用户信息中的头像 Key
@@ -194,10 +196,10 @@ async function handleAvatarChange(e: Event) {
       profile.value = updateRes.data
       authStore.setUser(updateRes.data)
     } else {
-      throw new Error(updateRes.message || '更新头像信息失败')
+      throw new Error(updateRes.message || t('profile.avatarUpdateFailed'))
     }
   } catch (err: any) {
-    error.value = err.message || '更新头像失败'
+    error.value = err.message || t('profile.avatarFailed')
     console.error('Avatar upload error:', err)
   } finally {
     isUploadingAvatar.value = false
@@ -214,7 +216,7 @@ async function handleDeleteAccount() {
       router.push('/login')
     }
   } catch (err: any) {
-    alert(err.message || '注销失败，请稍后再试')
+    alert(err.message || t('profile.deleteFailed'))
   } finally {
     deleting.value = false
     showDeleteConfirm.value = false
@@ -222,7 +224,7 @@ async function handleDeleteAccount() {
 }
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleString('zh-CN', {
+  return new Date(dateString).toLocaleString(locale.value, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -244,8 +246,8 @@ onUnmounted(() => {
   <div class="w-full flex justify-center">
     <div class="max-w-3xl w-full py-10 px-4">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">个人中心</h1>
-        <p class="text-gray-500 mt-1">管理您的账户信息和偏好设置</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('profile.title') }}</h1>
+        <p class="text-gray-500 mt-1">{{ t('profile.subtitle') }}</p>
       </div>
 
     <div v-if="loading" class="flex justify-center py-20">
@@ -257,7 +259,7 @@ onUnmounted(() => {
         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
       </svg>
       {{ error }}
-      <button @click="fetchProfile" class="ml-auto underline hover:text-red-700">重试</button>
+      <button @click="fetchProfile" class="ml-auto underline hover:text-red-700">{{ t('common.retry') }}</button>
     </div>
 
     <div v-else-if="profile" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -285,7 +287,7 @@ onUnmounted(() => {
               <div v-if="isUploadingAvatar" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
               <template v-else>
                 <span class="i-carbon-camera text-xl"></span>
-                <span class="text-[10px] font-medium">更换头像</span>
+                <span class="text-[10px] font-medium">{{ t('profile.changeAvatar') }}</span>
               </template>
             </button>
             <input 
@@ -302,7 +304,7 @@ onUnmounted(() => {
                 @click="startEdit"
                 class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
               >
-                编辑资料
+                {{ t('profile.editProfile') }}
               </button>
             </template>
             <template v-else>
@@ -311,7 +313,7 @@ onUnmounted(() => {
                 :disabled="saving"
                 class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               >
-                取消
+                {{ t('common.cancel') }}
               </button>
               <button 
                 @click="handleSave"
@@ -319,7 +321,7 @@ onUnmounted(() => {
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
               >
                 <span v-if="saving" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                {{ saving ? '保存中...' : '保存修改' }}
+                {{ saving ? t('common.saving') : t('common.save') }}
               </button>
             </template>
           </div>
@@ -333,42 +335,42 @@ onUnmounted(() => {
 
           <div class="space-y-4">
             <div v-if="isEditing" class="space-y-2">
-              <label class="text-sm font-medium text-gray-700">姓名</label>
+              <label class="text-sm font-medium text-gray-700">{{ t('profile.name') }}</label>
               <input 
                 v-model="editForm.name"
                 type="text"
                 class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                placeholder="请输入您的姓名"
+                :placeholder="t('profile.namePlaceholder')"
               >
             </div>
             <div v-else>
-              <h2 class="text-xl font-bold text-gray-900">{{ profile.name || '未设置姓名' }}</h2>
+              <h2 class="text-xl font-bold text-gray-900">{{ profile.name || t('common.noName') }}</h2>
               <p class="text-gray-500 text-sm">{{ profile.email }}</p>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
             <div class="space-y-1">
-              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">用户 ID</label>
+              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('profile.userId') }}</label>
               <p class="text-gray-900 font-mono">#{{ profile.id }}</p>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">邮箱地址</label>
+              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('profile.email') }}</label>
               <p class="text-gray-900">{{ profile.email }}</p>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">注册时间</label>
+              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('profile.createdAt') }}</label>
               <p class="text-gray-900">{{ formatDate(profile.createdAt) }}</p>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">最后更新</label>
+              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('profile.updatedAt') }}</label>
               <p class="text-gray-900">{{ formatDate(profile.updatedAt) }}</p>
             </div>
             <div class="space-y-1">
-              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">账户状态</label>
+              <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('profile.accountStatus') }}</label>
               <div class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                <p class="text-gray-900 text-sm">已激活</p>
+                <p class="text-gray-900 text-sm">{{ t('profile.active') }}</p>
               </div>
             </div>
           </div>
@@ -387,8 +389,8 @@ onUnmounted(() => {
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-gray-900">安全设置</h3>
-              <p class="text-sm text-gray-500">保护您的账户安全</p>
+              <h3 class="text-lg font-bold text-gray-900">{{ t('profile.securityTitle') }}</h3>
+              <p class="text-sm text-gray-500">{{ t('profile.securitySubtitle') }}</p>
             </div>
           </div>
           <button 
@@ -396,7 +398,7 @@ onUnmounted(() => {
             @click="startChangePassword"
             class="px-4 py-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
           >
-            修改密码
+            {{ t('profile.changePassword') }}
           </button>
         </div>
 
@@ -415,30 +417,30 @@ onUnmounted(() => {
           </div>
 
           <div class="space-y-2">
-            <label class="text-sm font-medium text-gray-700">当前密码</label>
+            <label class="text-sm font-medium text-gray-700">{{ t('profile.currentPassword') }}</label>
             <input 
               v-model="passwordForm.oldPassword"
               type="password"
               class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
-              placeholder="请输入当前密码"
+              :placeholder="t('profile.currentPasswordPlaceholder')"
             >
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium text-gray-700">新密码</label>
+            <label class="text-sm font-medium text-gray-700">{{ t('profile.newPassword') }}</label>
             <input 
               v-model="passwordForm.newPassword"
               type="password"
               class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
-              placeholder="请输入新密码（至少8位）"
+              :placeholder="t('profile.newPasswordPlaceholder')"
             >
           </div>
           <div class="space-y-2">
-            <label class="text-sm font-medium text-gray-700">确认新密码</label>
+            <label class="text-sm font-medium text-gray-700">{{ t('profile.confirmPassword') }}</label>
             <input 
               v-model="passwordForm.confirmPassword"
               type="password"
               class="block w-full px-4 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition-all"
-              placeholder="请再次输入新密码"
+              :placeholder="t('profile.confirmPasswordPlaceholder')"
             >
           </div>
 
@@ -448,7 +450,7 @@ onUnmounted(() => {
               :disabled="passwordSaving"
               class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             >
-              取消
+              {{ t('common.cancel') }}
             </button>
             <button 
               @click="handlePasswordSave"
@@ -456,7 +458,7 @@ onUnmounted(() => {
               class="px-4 py-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
             >
               <span v-if="passwordSaving" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-              {{ passwordSaving ? '修改中...' : '确认修改' }}
+              {{ passwordSaving ? t('profile.passwordSaving') : t('profile.confirmPasswordChange') }}
             </button>
           </div>
         </div>
@@ -465,7 +467,7 @@ onUnmounted(() => {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
           </svg>
-          定期修改密码可以提高账户安全性
+          {{ t('profile.passwordTip') }}
         </div>
       </div>
     </div>
@@ -481,15 +483,15 @@ onUnmounted(() => {
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-gray-900">危险区域</h3>
-              <p class="text-sm text-gray-500">这些操作不可逆，请谨慎操作</p>
+              <h3 class="text-lg font-bold text-gray-900">{{ t('profile.dangerTitle') }}</h3>
+              <p class="text-sm text-gray-500">{{ t('profile.dangerSubtitle') }}</p>
             </div>
           </div>
           <button 
             @click="openDeleteConfirm"
             class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
           >
-            注销账号
+            {{ t('profile.deleteAccount') }}
           </button>
         </div>
       </div>
@@ -498,11 +500,11 @@ onUnmounted(() => {
     <!-- 注销确认弹窗 -->
     <ConfirmModal
       :show="showDeleteConfirm"
-      title="确认注销账号？"
-      message="一旦注销，您的所有数据将被永久删除。请注意：注销后，相同的电子邮箱地址将无法再次注册此平台。"
-      :confirm-text="deleteCountdown > 0 ? `确认注销 (${deleteCountdown}s)` : '确认注销'"
+      :title="t('profile.deleteTitle')"
+      :message="t('profile.deleteMessage')"
+      :confirm-text="deleteCountdown > 0 ? t('profile.deleteConfirmCountdown', { seconds: deleteCountdown }) : t('profile.deleteConfirm')"
       :confirm-disabled="deleteCountdown > 0 || deleting"
-      cancel-text="取消"
+      :cancel-text="t('common.cancel')"
       @confirm="handleDeleteAccount"
       @cancel="showDeleteConfirm = false"
     />

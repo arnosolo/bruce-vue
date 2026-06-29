@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from '../i18n'
+
 interface Props {
   show: boolean
   title?: string
@@ -9,13 +12,14 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: '确认',
-  confirmText: '确定',
-  cancelText: '取消',
   confirmDisabled: false
 })
 
 const emit = defineEmits(['confirm', 'cancel'])
+const { t } = useI18n()
+const titleText = computed(() => props.title || t('common.confirm'))
+const confirmLabel = computed(() => props.confirmText || t('common.confirm'))
+const cancelLabel = computed(() => props.cancelText || t('common.cancel'))
 </script>
 
 <template>
@@ -27,7 +31,7 @@ const emit = defineEmits(['confirm', 'cancel'])
       <!-- Modal Content -->
       <div class="relative bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all scale-100">
         <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-2">{{ title }}</h3>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">{{ titleText }}</h3>
           <p class="text-gray-600">{{ message }}</p>
         </div>
         
@@ -36,14 +40,14 @@ const emit = defineEmits(['confirm', 'cancel'])
             @click="emit('cancel')"
             class="flex-1 px-4 py-3 text-gray-500 hover:bg-gray-50 transition-colors font-medium border-r border-none"
           >
-            {{ cancelText }}
+            {{ cancelLabel }}
           </button>
           <button 
             @click="!confirmDisabled && emit('confirm')"
             :disabled="confirmDisabled"
             class="flex-1 px-4 py-3 text-blue-600 hover:bg-blue-50 transition-colors font-bold border-none disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
           >
-            {{ confirmText }}
+            {{ confirmLabel }}
           </button>
         </div>
       </div>

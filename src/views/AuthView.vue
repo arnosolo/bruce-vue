@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from '../i18n'
 import { useAuthStore } from '../stores/auth'
 import { authApi } from '../api/auth'
 import { systemApi } from '../api/system'
-import { SystemStatus, SYSTEM_STATUS_CONFIG } from '../types/system'
+import { SystemStatus, SYSTEM_STATUS_CONFIG, getSystemStatusText } from '../types/system'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 // 服务器状态
 const serverStatus = ref<SystemStatus>(SystemStatus.Checking)
@@ -69,7 +71,7 @@ async function handleSubmit() {
   }
 
   if (!form.value.email || !form.value.password) {
-    error.value = '请输入邮箱和密码'
+    error.value = t('auth.missingCredentials')
     return
   }
 
@@ -87,10 +89,10 @@ async function handleSubmit() {
         authStore.setAuth(result.data.token, result.data.user)
         router.push('/')
       } else {
-        error.value = result.message || '登录失败'
+        error.value = result.message || t('auth.loginFailed')
         if (error.value.includes('未验证')) {
           mode.value = 'verify'
-          successMessage.value = '请完成邮箱验证后再登录'
+          successMessage.value = t('auth.verifyBeforeLogin')
         }
       }
     } else {
@@ -101,17 +103,17 @@ async function handleSubmit() {
       })
       if (result.success) {
         mode.value = 'verify'
-        successMessage.value = '注册成功！验证码已发送至您的邮箱'
+        successMessage.value = t('auth.registerSuccess')
         startCountdown()
       } else {
-        error.value = result.message || '注册失败'
+        error.value = result.message || t('auth.registerFailed')
       }
     }
   } catch (err: any) {
-    error.value = err.response?.data?.message || err.message || '网络错误，请稍后再试'
+    error.value = err.response?.data?.message || err.message || t('auth.networkError')
     if (error.value.includes('未验证') && mode.value === 'login') {
       mode.value = 'verify'
-      successMessage.value = '请完成邮箱验证后再登录'
+      successMessage.value = t('auth.verifyBeforeLogin')
     }
     console.error(err)
   } finally {
@@ -122,7 +124,7 @@ async function handleSubmit() {
 // 验证验证码
 async function handleVerify() {
   if (!form.value.code || form.value.code.length !== 6) {
-    error.value = '请输入6位有效验证码'
+    error.value = t('auth.invalidCode')
     return
   }
 
@@ -135,14 +137,14 @@ async function handleVerify() {
       code: form.value.code
     })
     if (result.success) {
-      successMessage.value = '邮箱验证成功！请登录'
+      successMessage.value = t('auth.verifySuccess')
       mode.value = 'login'
       form.value.code = ''
     } else {
-      error.value = result.message || '验证失败'
+      error.value = result.message || t('auth.verifyFailed')
     }
   } catch (err: any) {
-    error.value = err.response?.data?.message || err.message || '验证码错误或已过期'
+    error.value = err.response?.data?.message || err.message || t('auth.codeExpired')
   } finally {
     loading.value = false
   }
@@ -158,32 +160,32 @@ async function handleResendCode() {
   try {
     const result = await authApi.resendCode({ email: form.value.email })
     if (result.success) {
-      successMessage.value = '验证码已重发，请查收'
+      successMessage.value = t('auth.resendSuccess')
       startCountdown()
     } else {
-      error.value = result.message || '发送失败'
+      error.value = result.message || t('auth.sendFailed')
     }
   } catch (err: any) {
-    error.value = err.response?.data?.message || err.message || '发送失败，请稍后再试'
+    error.value = err.response?.data?.message || err.message || t('auth.sendLater')
   } finally {
     resending.value = false
   }
 }
 
 const title = computed(() => {
-  if (mode.value === 'login') return '欢迎回来'
-  if (mode.value === 'register') return '创建账号'
-  return '验证邮箱'
+  if (mode.value === 'login') return t('auth.loginTitle')
+  if (mode.value === 'register') return t('auth.registerTitle')
+  return t('auth.verifyTitle')
 })
 const submitText = computed(() => {
   if (loading.value) {
-    if (mode.value === 'login') return '登录中...'
-    if (mode.value === 'register') return '注册中...'
-    return '验证中...'
+    if (mode.value === 'login') return t('auth.loginLoading')
+    if (mode.value === 'register') return t('auth.registerLoading')
+    return t('auth.verifyLoading')
   }
-  if (mode.value === 'login') return '登录'
-  if (mode.value === 'register') return '立即注册'
-  return '验证'
+  if (mode.value === 'login') return t('nav.login')
+  if (mode.value === 'register') return t('auth.registerSubmit')
+  return t('auth.verifySubmit')
 })
 </script>
 
@@ -197,23 +199,23 @@ const submitText = computed(() => {
           :class="mode === 'login' ? 'bg-white shadow-sm text-blue-600' : 'bg-transparent text-gray-500 hover:text-gray-700'"
           @click="toggleMode('login')"
         >
-          登录
+          {{ t('auth.loginTab') }}
         </button>
         <button 
           class="flex-1 py-2 rounded-md text-sm font-medium transition-all duration-200 border-none outline-none cursor-pointer"
           :class="mode === 'register' ? 'bg-white shadow-sm text-green-600' : 'bg-transparent text-gray-500 hover:text-gray-700'"
           @click="toggleMode('register')"
         >
-          注册
+          {{ t('auth.registerTab') }}
         </button>
       </div>
 
       <div class="text-center mb-8">
         <h2 class="text-3xl font-bold text-gray-800">{{ title }}</h2>
         <p class="text-gray-500 mt-2 text-sm">
-          <template v-if="mode === 'login'">请输入您的凭据以访问您的帐户</template>
-          <template v-else-if="mode === 'register'">只需几秒钟即可开启您的智能服务之旅</template>
-          <template v-else>验证码已发送至 <b>{{ form.email }}</b></template>
+          <template v-if="mode === 'login'">{{ t('auth.loginSubtitle') }}</template>
+          <template v-else-if="mode === 'register'">{{ t('auth.registerSubtitle') }}</template>
+          <template v-else>{{ t('auth.verifySubtitle', { email: form.email }) }}</template>
         </p>
       </div>
 
@@ -221,7 +223,7 @@ const submitText = computed(() => {
         <!-- 验证码模式 -->
         <div v-if="mode === 'verify'" class="space-y-4">
           <div>
-            <label for="code" class="block text-sm font-medium text-gray-700 mb-1">6位验证码</label>
+            <label for="code" class="block text-sm font-medium text-gray-700 mb-1">{{ t('auth.codeLabel') }}</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                 <div class="i-carbon-security w-5 h-5"></div>
@@ -239,14 +241,14 @@ const submitText = computed(() => {
           </div>
           
           <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">没有收到邮件？</span>
+            <span class="text-gray-500">{{ t('auth.noEmail') }}</span>
             <button 
               type="button" 
               class="text-blue-600 font-medium hover:underline disabled:text-gray-400 disabled:no-underline cursor-pointer border-none bg-transparent"
               :disabled="countdown > 0 || resending"
               @click="handleResendCode"
             >
-              {{ countdown > 0 ? `${countdown}秒后可重发` : (resending ? '发送中...' : '重发验证码') }}
+              {{ countdown > 0 ? t('auth.resendIn', { seconds: countdown }) : (resending ? t('auth.sending') : t('auth.resendCode')) }}
             </button>
           </div>
         </div>
@@ -254,7 +256,7 @@ const submitText = computed(() => {
         <template v-else>
           <!-- 姓名字段（仅注册显示） -->
           <div v-if="mode === 'register'" class="transition-all duration-300">
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名 (可选)</label>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ t('auth.nameLabel') }}</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                 <div class="i-carbon-user w-5 h-5"></div>
@@ -263,7 +265,7 @@ const submitText = computed(() => {
                 id="name"
                 v-model="form.name" 
                 type="text" 
-                placeholder="张三"
+                :placeholder="t('auth.namePlaceholder')"
                 class="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               >
             </div>
@@ -271,7 +273,7 @@ const submitText = computed(() => {
 
           <!-- 邮箱字段 -->
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">{{ t('auth.emailLabel') }}</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                 <div class="i-carbon-email w-5 h-5"></div>
@@ -289,7 +291,7 @@ const submitText = computed(() => {
           
           <!-- 密码字段 -->
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{ t('auth.passwordLabel') }}</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                 <div class="i-carbon-password w-5 h-5"></div>
@@ -339,21 +341,24 @@ const submitText = computed(() => {
             class="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium border-none bg-transparent cursor-pointer transition-colors"
             @click="toggleMode('login')"
           >
-            返回登录
+            {{ t('auth.backToLogin') }}
           </button>
           <button 
             type="button" 
             class="w-full text-center text-sm text-gray-500 hover:text-gray-700 border-none bg-transparent cursor-pointer transition-colors"
             @click="toggleMode('register')"
           >
-            重新注册
+            {{ t('auth.registerAgain') }}
           </button>
         </div>
       </form>
       
       <div class="mt-8 flex flex-col items-center gap-4">
         <p class="text-center text-xs text-gray-400">
-          登录即表示您同意我们的 <router-link to="/docs/terms" class="text-gray-600 underline">服务条款</router-link> 和 <router-link to="/docs/privacy" class="text-gray-600 underline">隐私政策</router-link>
+          {{ t('auth.agreementPrefix') }}
+          <router-link to="/docs/terms" class="text-gray-600 underline">{{ t('footer.terms') }}</router-link>
+          {{ t('auth.agreementAnd') }}
+          <router-link to="/docs/privacy" class="text-gray-600 underline">{{ t('footer.privacy') }}</router-link>
         </p>
         
         <!-- 服务器状态显示 -->
@@ -363,7 +368,7 @@ const submitText = computed(() => {
             :style="{ backgroundColor: SYSTEM_STATUS_CONFIG[serverStatus]?.bgColor }"
           ></div>
           <span class="text-[10px] font-medium uppercase tracking-wider text-gray-500">
-            {{ SYSTEM_STATUS_CONFIG[serverStatus].text }}
+            {{ getSystemStatusText(serverStatus) }}
           </span>
         </div>
       </div>

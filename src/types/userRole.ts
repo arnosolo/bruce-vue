@@ -1,4 +1,5 @@
-import { mapToEnum } from "../utils/mapToEnum";
+import { t } from '../i18n'
+import { mapToEnum } from '../utils/mapToEnum'
 
 /**
  * 用户角色定义
@@ -9,6 +10,11 @@ export const UserRole = {
   AI: 'AI',
   Admin: 'ADMIN',
 } as const;
+
+export function getUserRoleLabel(val: unknown) {
+  const role = mapToEnum(val, UserRole)
+  return role !== undefined ? t(`role.${role}`) : undefined
+}
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 

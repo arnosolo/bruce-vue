@@ -1,33 +1,36 @@
 <script setup lang="ts">
-import { APP_NAME, APP_VERSION, SOURCE_CODE_URL } from '../constants'
+import { computed } from 'vue'
+import { APP_VERSION, SOURCE_CODE_URL } from '../constants'
 import { RouterLink } from 'vue-router'
+import { useI18n } from '../i18n'
 import { useAuthStore } from '../stores/auth'
-import { USER_ROLE_CONFIG } from '../types/userRole';
+import { UserRole, getUserRoleLabel } from '../types/userRole';
 
 const authStore = useAuthStore()
+const { t } = useI18n()
 
-const features = [
+const features = computed(() => [
   {
-    title: '对话即操作',
-    description: '无需寻找复杂的菜单，直接告诉 AI 你的需求。从查询信息到修改设置，一切操作都在对话中完成。',
+    title: t('home.feature1Title'),
+    description: t('home.feature1Description'),
     icon: 'i-carbon-chat'
   },
   {
-    title: '意图精准识别',
-    description: '深度理解自然语言，精准捕获用户意图。将繁琐的多步点击简化为一句简单的指令。',
+    title: t('home.feature2Title'),
+    description: t('home.feature2Description'),
     icon: 'i-carbon-send-alt'
   },
   {
-    title: '零学习成本',
-    description: '摆脱传统图形界面的束缚，用最自然的交流方式使用系统。让每一位用户都能像操作专家一样高效。',
+    title: t('home.feature3Title'),
+    description: t('home.feature3Description'),
     icon: 'i-carbon-user-favorite'
   },
   {
-    title: '全场景覆盖',
-    description: '无论是业务咨询、故障排查还是后台管理，AI 都能成为你最得力的交互入口。',
+    title: t('home.feature4Title'),
+    description: t('home.feature4Description'),
     icon: 'i-carbon-grid'
   }
-]
+])
 </script>
 
 <template>
@@ -44,16 +47,16 @@ const features = [
         <div class="text-center">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-8 animate-fade-in">
             <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">AI-Powered Operations</span>
+            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">{{ t('home.badge') }}</span>
           </div>
           
           <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tight leading-[1.1] mb-8">
-            <span class="block">对话，即是</span>
-            <span class="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-fill-transparent py-1">全能生产力</span>
+            <span class="block">{{ t('home.heroLine1') }}</span>
+            <span class="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-fill-transparent py-1">{{ t('home.heroLine2') }}</span>
           </h1>
           
           <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-500 leading-relaxed font-medium">
-            跳过繁琐的菜单与点击。在 {{ APP_NAME }} 中，只需一句简单的指令，AI 即可为您精准执行业务操作。
+            {{ t('home.heroDescription', { appName: t('app.name') }) }}
           </p>
 
           <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -61,7 +64,7 @@ const features = [
               :to="authStore.isAuthenticated ? '/chat' : '/auth'"
               class="w-full sm:w-auto px-10 py-4 text-lg font-bold text-white bg-gray-900 hover:bg-blue-600 rounded-2xl shadow-2xl shadow-gray-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3"
             >
-              <span>立即开始对话</span>
+              <span>{{ t('home.cta') }}</span>
               <span class="i-carbon-arrow-right text-xl"></span>
             </RouterLink>
           </div>
@@ -119,7 +122,7 @@ const features = [
                   <div class="p-4 bg-blue-600 text-white flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="i-carbon-bot text-xl"></span>
-                      <span class="text-sm font-bold">{{ USER_ROLE_CONFIG.AI.text }}</span>
+                      <span class="text-sm font-bold">{{ getUserRoleLabel(UserRole.AI) }}</span>
                     </div>
                     <div class="flex gap-1">
                       <div class="w-2 h-2 rounded-full bg-white/40"></div>
@@ -132,12 +135,12 @@ const features = [
                         <span class="i-carbon-bot text-xs"></span>
                       </div>
                       <div class="bg-white p-3 rounded-2xl rounded-tl-none text-xs text-gray-800 leading-relaxed border border-gray-100 shadow-sm">
-                        您好！我是您的智能助手。有什么我可以帮您的吗？
+                        {{ t('home.demoBotGreeting') }}
                       </div>
                     </div>
                     <div class="flex gap-3 justify-end">
                       <div class="bg-blue-600 p-3 rounded-2xl rounded-tr-none text-xs text-white leading-relaxed shadow-sm">
-                        把我的名字改成大黄
+                        {{ t('home.demoUserMessage') }}
                       </div>
                       <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 shadow-sm"></div>
                     </div>
@@ -146,7 +149,7 @@ const features = [
                         <span class="i-carbon-bot text-xs"></span>
                       </div>
                       <div class="bg-white p-3 rounded-2xl rounded-tl-none text-xs text-gray-800 leading-relaxed border border-gray-100 shadow-sm">
-                        好的，我已经将您的名字更改为大黄。
+                        {{ t('home.demoBotReply') }}
                       </div>
                     </div>
                   </div>
@@ -162,8 +165,8 @@ const features = [
     <section id="features" class="w-full flex justify-center bg-gray-50/50 py-24">
       <div class="max-w-7xl w-full px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl font-black text-gray-900 mb-4 text-gradient">核心优势</h2>
-          <p class="text-gray-500 max-w-2xl mx-auto">重塑人机交互体验，让每一个指令都能精准触达业务核心。</p>
+          <h2 class="text-3xl font-black text-gray-900 mb-4 text-gradient">{{ t('home.featuresTitle') }}</h2>
+          <p class="text-gray-500 max-w-2xl mx-auto">{{ t('home.featuresSubtitle') }}</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div 
@@ -191,16 +194,16 @@ const features = [
             <div class="absolute -inset-4 bg-blue-100/50 rounded-3xl blur-2xl"></div>
             <div class="relative bg-white border border-gray-100 rounded-3xl p-10 shadow-sm overflow-hidden">
               <div class="flex items-center justify-between mb-8">
-                <h3 class="font-bold text-gray-900 text-xl">系统信息</h3>
+                <h3 class="font-bold text-gray-900 text-xl">{{ t('footer.systemInfo') }}</h3>
               </div>
               
               <div class="space-y-6">
                 <div class="flex justify-between items-center py-4 border-b border-gray-50">
-                  <span class="text-gray-500">当前版本</span>
+                  <span class="text-gray-500">{{ t('footer.version') }}</span>
                   <span class="font-mono font-bold text-gray-900">{{ APP_VERSION }}</span>
                 </div>
                 <div class="flex justify-between items-center py-4 border-b border-gray-50">
-                  <span class="text-gray-500">开源许可</span>
+                  <span class="text-gray-500">{{ t('home.license') }}</span>
                   <span class="font-bold text-gray-900">MIT License</span>
                 </div>
               </div>
@@ -211,7 +214,7 @@ const features = [
                 class="w-full mt-10 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-3 shadow-lg shadow-gray-200"
               >
                 <span class="i-carbon-logo-github text-2xl"></span>
-                <span>查看源代码</span>
+                <span>{{ t('home.viewSource') }}</span>
               </a>
             </div>
           </div>

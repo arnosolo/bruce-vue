@@ -1,4 +1,5 @@
 import type { BaseResponse } from './api'
+import { t } from '../i18n'
 
 export interface HealthData {
   status: string
@@ -16,6 +17,10 @@ export const SystemStatus = {
   Offline: 'offline',
   Checking: 'checking',
 } as const;
+
+export function getSystemStatusText(status: SystemStatus) {
+  return t(`status.${status}`)
+}
 
 export type SystemStatus = (typeof SystemStatus)[keyof typeof SystemStatus];
 
