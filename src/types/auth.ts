@@ -2,6 +2,18 @@ import type { User } from './user'
 import type { BaseResponse } from './api'
 
 /**
+ * 认证页面模式
+ */
+export const AuthMode = {
+  Login: 'login',
+  Register: 'register',
+  Verify: 'verify',
+  CodeLogin: 'codeLogin'
+} as const
+
+export type AuthMode = (typeof AuthMode)[keyof typeof AuthMode]
+
+/**
  * 接口特定的数据传输对象 (DTOs)
  */
 export interface AuthData {
@@ -52,6 +64,26 @@ export interface ResendCodeParams {
 
 /** 重发验证码响应 */
 export interface ResendCodeResponse extends BaseResponse<void> {}
+
+/** 发送登录验证码参数 */
+export interface SendLoginCodeParams {
+  /** 电子邮箱 */
+  email: string
+}
+
+/** 发送登录验证码响应 */
+export interface SendLoginCodeResponse extends BaseResponse<void> {}
+
+/** 验证码登录参数 */
+export interface LoginByCodeParams {
+  /** 电子邮箱 */
+  email: string
+  /** 6位验证码 */
+  code: string
+}
+
+/** 验证码登录响应 */
+export interface LoginByCodeResponse extends BaseResponse<AuthData> {}
 
 /** 获取个人资料响应 */
 export interface ProfileResponse extends BaseResponse<User> {}

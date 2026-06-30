@@ -8,6 +8,10 @@ import type {
   VerifyEmailResponse,
   ResendCodeParams,
   ResendCodeResponse,
+  SendLoginCodeParams,
+  SendLoginCodeResponse,
+  LoginByCodeParams,
+  LoginByCodeResponse,
   ProfileResponse, 
   UpdateProfileParams, 
   UpdateProfileResponse, 
@@ -46,6 +50,20 @@ export const authApi = {
    */
   resendCode(data: ResendCodeParams): Promise<ResendCodeResponse> {
     return http.post('/auth/resend-code', data)
+  },
+
+  /**
+   * 发送登录验证码（免注册登录第一步）
+   */
+  sendLoginCode(data: SendLoginCodeParams): Promise<SendLoginCodeResponse> {
+    return http.post('/auth/send-login-code', data)
+  },
+
+  /**
+   * 验证码登录（免注册登录第二步）
+   */
+  loginByCode(data: LoginByCodeParams): Promise<LoginByCodeResponse> {
+    return http.post('/auth/login-by-code', data)
   },
 
   /**
