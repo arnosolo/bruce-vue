@@ -1,3 +1,5 @@
+import type { Pagination } from './api'
+
 /**
  * 会话信息
  */
@@ -24,9 +26,9 @@ export interface Conversation {
 export type MessageType = 'TEXT' | 'IMAGE' | 'FILE'
 
 /**
- * 消息信息
+ * API 返回的消息信息
  */
-export interface Message {
+export interface MessageDTO {
   /** 消息 ID */
   id: number
   /** 消息内容 (文本消息内容或附件说明) */
@@ -50,6 +52,12 @@ export interface Message {
   } | null
   /** 发送时间 */
   createdAt: string
+}
+
+/**
+ * 视图层消息信息
+ */
+export interface ChatMessage extends MessageDTO {
   /** 消息状态 (仅本地使用) */
   status?: 'sending' | 'error'
 }
@@ -64,20 +72,6 @@ export interface SendMessageRequest {
   type?: MessageType
   /** 附件在 OSS 中的 Key (上传图片/文件后获得) */
   attachmentKey?: string
-}
-
-/**
- * 分页信息
- */
-export interface Pagination {
-  /** 总条数 */
-  total: number
-  /** 当前页码 */
-  page: number
-  /** 每页限制数量 */
-  limit: number
-  /** 总页数 */
-  totalPages: number
 }
 
 /**
@@ -118,7 +112,7 @@ export interface ConversationListResponse {
  */
 export interface MessageListResponse {
   /** 消息列表 */
-  list: Message[]
+  list: MessageDTO[]
   /** 下一页游标 (无下一页时为 null) */
   nextCursor: number | null
 }
@@ -128,9 +122,9 @@ export interface MessageListResponse {
  */
 export interface SendMessageResponse {
   /** 用户发送的消息对象 */
-  userMessage: Message
+  userMessage: MessageDTO
   /** AI 回复的消息对象 */
-  aiMessage: Message
+  aiMessage: MessageDTO
 }
 
 /**
@@ -140,7 +134,7 @@ export interface StreamChunk {
   /** 消息内容片段 */
   content?: string
   /** 完整的消息对象 (通常在流结束或特定阶段返回) */
-  message?: Message
+  message?: MessageDTO
   /** 是否结束标识 */
   done?: boolean
 }

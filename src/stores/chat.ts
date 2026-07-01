@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { chatApi } from '../api/chat'
 import { TITLE_SUMMARIZATION_THRESHOLD } from '../constants'
-import type { Conversation, Message, MessageType } from '../types/chat'
+import type { ChatMessage, Conversation, MessageType } from '../types/chat'
 
 export const useChatStore = defineStore('chat', () => {
   const conversations = ref<Conversation[]>([])
   const currentConversationId = ref<number | null>(null)
-  const messages = ref<Message[]>([])
+  const messages = ref<ChatMessage[]>([])
   const isLoading = ref(false)
   const isSending = ref(false)
   const pagination = ref({
@@ -64,7 +64,7 @@ export const useChatStore = defineStore('chat', () => {
     
     // 1. 乐观更新：立即显示用户消息或更新现有消息状态
     if (!messageId) {
-      const tempUserMessage: Message = {
+      const tempUserMessage: ChatMessage = {
         id: tempId,
         content,
         role: 'USER',
@@ -127,7 +127,7 @@ export const useChatStore = defineStore('chat', () => {
     
     // 1. 乐观更新
     if (!messageId) {
-      const tempUserMessage: Message = {
+      const tempUserMessage: ChatMessage = {
         id: tempId,
         content,
         role: 'USER',
@@ -149,7 +149,7 @@ export const useChatStore = defineStore('chat', () => {
 
     // 2. 预占 AI 消息位
     const aiTempId = tempId + 1
-    const aiMessage: Message = {
+    const aiMessage: ChatMessage = {
       id: aiTempId,
       content: '',
       role: 'ASSISTANT',
@@ -215,7 +215,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function retryMessage(message: Message) {
+  async function retryMessage(message: ChatMessage) {
     if (message.role !== 'USER') return
     // 对于流式，目前业务上逻辑较复杂，先以常规消息重试为例
     // 如果是图片消息

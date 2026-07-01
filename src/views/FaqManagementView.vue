@@ -2,10 +2,15 @@
 import { ref, onMounted, reactive, watch } from 'vue'
 import { faqApi } from '../api/faq'
 import { useI18n } from '../i18n'
-import type { Faq, CreateFaqRequest } from '../types/faq'
+import type { Faq } from '../types/faq'
 import type { Pagination as PaginationType } from '../types/api'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import Pagination from '../components/Pagination.vue'
+
+interface FaqForm {
+  question: string
+  answer: string
+}
 
 const { t } = useI18n()
 const faqs = ref<Faq[]>([])
@@ -25,7 +30,7 @@ const pagination = ref<PaginationType>({
 const showFormModal = ref(false)
 const showDeleteConfirm = ref(false)
 const currentFaq = ref<Faq | null>(null)
-const formData = reactive<CreateFaqRequest>({
+const formData = reactive<FaqForm>({
   question: '',
   answer: ''
 })

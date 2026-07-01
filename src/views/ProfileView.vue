@@ -9,6 +9,16 @@ import { compressImage } from '../utils/image'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import type { User } from '../types/user'
 
+interface ProfileEditForm {
+  name: string
+}
+
+interface PasswordForm {
+  oldPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
 const authStore = useAuthStore()
 const router = useRouter()
 const { locale, t } = useI18n()
@@ -18,7 +28,7 @@ const error = ref('')
 
 const isEditing = ref(false)
 const saving = ref(false)
-const editForm = reactive({
+const editForm = reactive<ProfileEditForm>({
   name: ''
 })
 
@@ -29,7 +39,7 @@ const isChangingPassword = ref(false)
 const passwordSaving = ref(false)
 const passwordError = ref('')
 const passwordSuccess = ref('')
-const passwordForm = reactive({
+const passwordForm = reactive<PasswordForm>({
   oldPassword: '',
   newPassword: '',
   confirmPassword: ''
