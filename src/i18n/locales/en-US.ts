@@ -134,6 +134,8 @@ export const enUS: Messages = {
     'chat.uploadFailed': 'Upload failed',
     'chat.imageUploadFailed': 'Image upload failed',
     'chat.newConversation': 'New conversation',
+    'chat.copy': 'Copy',
+    'chat.copySuccess': 'Copied to clipboard',
     'profile.title': 'Profile',
     'profile.subtitle': 'Manage your account information and preferences',
     'profile.fetchFailed': 'Failed to fetch profile',

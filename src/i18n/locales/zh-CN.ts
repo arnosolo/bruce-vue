@@ -134,6 +134,8 @@ export const zhCN: Messages = {
     'chat.uploadFailed': '上传失败',
     'chat.imageUploadFailed': '图片上传失败',
     'chat.newConversation': '新会话',
+    'chat.copy': '复制',
+    'chat.copySuccess': '已复制到剪贴板',
     'profile.title': '个人中心',
     'profile.subtitle': '管理您的账户信息和偏好设置',
     'profile.fetchFailed': '获取个人资料失败',

@@ -7,6 +7,7 @@ import { systemApi } from '../api/system'
 import { useI18n } from '../i18n'
 import { renderMarkdown } from '../utils/markdown'
 import { UserRole, getUserRoleLabel } from '../types/userRole'
+import type { ChatMessage } from '../types/chat'
 
 const chatStore = useChatStore()
 const authStore = useAuthStore()
@@ -18,6 +19,7 @@ const messageContainer = ref<HTMLElement | null>(null)
 const isSidebarOpen = ref(false) // 移动端侧边栏状态
 const fileInput = ref<HTMLInputElement | null>(null)
 const isUploading = ref(false)
+const copiedMessageId = ref<number | null>(null)
 
 const scrollToBottom = async () => {
   await nextTick()
@@ -93,6 +95,20 @@ const selectConversation = (id: number) => {
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value
+}
+
+const copyMessageContent = async (msg: ChatMessage) => {
+  try {
+    await navigator.clipboard.writeText(msg.content)
+    copiedMessageId.value = msg.id
+    setTimeout(() => {
+      if (copiedMessageId.value === msg.id) {
+        copiedMessageId.value = null
+      }
+    }, 2000)
+  } catch {
+    // 复制失败，静默忽略
+  }
 }
 
 const formatMessageTime = (dateStr: string) => {
@@ -209,12 +225,22 @@ const formatMessageTime = (dateStr: string) => {
                 <template v-if="msg.type === 'IMAGE'">
                   <img :src="msg.url || ''" alt="image message" class="max-w-full block cursor-zoom-in hover:opacity-90 transition-opacity" />
                 </template>
-                <div 
-                  v-else 
-                  class="markdown-body prose prose-sm max-w-none text-inherit"
-                  :class="[msg.role === 'USER' ? 'prose-invert' : '']"
-                  v-html="renderMarkdown(msg.content)"
-                ></div>
+                <template v-else>
+                  <!-- 复制按钮 (hover 显示) -->
+                  <button
+                    @click.stop="copyMessageContent(msg)"
+                    class="absolute top-2 right-2 p-1.5 rounded-lg bg-white hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm text-gray-500"
+                    :title="copiedMessageId === msg.id ? t('chat.copySuccess') : t('chat.copy')"
+                  >
+                    <span v-if="copiedMessageId === msg.id" class="i-carbon-checkmark text-sm text-green-600"></span>
+                    <span v-else class="i-carbon-copy text-sm"></span>
+                  </button>
+                  <div 
+                    class="markdown-body prose prose-sm max-w-none text-inherit"
+                    :class="[msg.role === 'USER' ? 'prose-invert' : '']"
+                    v-html="renderMarkdown(msg.content)"
+                  ></div>
+                </template>
               </div>
 
               <!-- Status Indicators (Below bubble) -->
