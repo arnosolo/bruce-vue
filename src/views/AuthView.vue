@@ -377,16 +377,7 @@ const submitText = computed(() => {
             </div>
           </div>
 
-          <!-- 切换到密码登录 -->
-          <div class="text-center pt-1">
-            <button 
-              type="button" 
-              class="text-sm text-blue-600 hover:text-blue-700 font-medium border-none bg-transparent cursor-pointer transition-colors"
-              @click="toggleMode(AuthMode.Login)"
-            >
-              {{ t('auth.usePasswordLogin') }}
-            </button>
-          </div>
+
         </div>
 
         <template v-else>
@@ -443,16 +434,7 @@ const submitText = computed(() => {
             </div>
           </div>
 
-          <!-- 切换到验证码登录（仅登录模式显示） -->
-          <div v-if="mode === AuthMode.Login" class="text-right">
-            <button 
-              type="button" 
-              class="text-sm text-purple-600 hover:text-purple-700 font-medium border-none bg-transparent cursor-pointer transition-colors"
-              @click="toggleMode(AuthMode.CodeLogin)"
-            >
-              {{ t('auth.useCodeLogin') }}
-            </button>
-          </div>
+
         </template>
 
         <!-- 成功提示 -->
